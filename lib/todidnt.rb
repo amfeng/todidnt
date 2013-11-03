@@ -30,5 +30,5 @@ class ToDidnt
   end
 end
 
-todidnt = ToDidnt.new('~/Stripe/pay-server')
-todidnt.run
+#todidnt = ToDidnt.new('~/Stripe/pay-server')
+#todidnt.run

@@ -10,8 +10,8 @@ class TodoLine
     grep = GitCommand.new(:grep, options)
     grep.output_lines.map do |line|
       filename, line_number, content = line.split(/:/, 3)
-        unless filename =~ IGNORE
-          lines = self.new(filename, line_number.to_i, content.strip[0..100])
+      unless filename =~ IGNORE
+        lines = self.new(filename, line_number.to_i, content.strip[0..100])
       end
     end.compact
   end
