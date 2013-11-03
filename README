@@ -2,6 +2,7 @@ TODO:
 
 - finish refactoring
 - tests
+- actual logging that is not putsing
 - command line args
 - gem-ify
 - optimize blames
