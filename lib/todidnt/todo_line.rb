@@ -1,28 +1,3 @@
-class GitCommand
-  def initialize(command, options)
-    @command = command
-    @options = options
-  end
-
-  def output_lines
-    run!.strip.split(/\n/)
-  end
-
-  def run!
-    `git #{command_with_options}`
-  end
-
-  def command_with_options
-    full_command = @command.to_s
-
-    for option in @options
-      full_command << " #{option.join(' ')}"
-    end
-
-    full_command
-  end
-end
-
 class TodoLine
   IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary}
 
@@ -47,11 +22,21 @@ class TodoLine
     @content = content
   end
 
+  # TODO: This logic should probably be moved out somewhere else
   def populate_blame
-    line = `git blame --line-porcelain -L #{@line_number},#{@line_number} #{@filename}`
-    if (author = /author (.*)/.match(line)) && (author_time = /author-time (.*)/.match(line))
-      @author = author[1]
-      @timestamp = author_time[1].to_i
+    options = [
+      ['--line-porcelain'],
+      ['-L', "#{@line_number},#{@line_number}"],
+      [@filename]
+    ]
+
+    blame = GitCommand.new(:blame, options)
+    blame.output_lines.each do |line|
+      if (author = /author (.*)/.match(line))
+        @author = author[1]
+      elsif (author_time = /author-time (.*)/.match(line))
+        @timestamp = author_time[1].to_i
+      end
     end
   end
 

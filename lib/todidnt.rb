@@ -1,30 +1,17 @@
+require_relative 'todidnt/git_repo'
+require_relative 'todidnt/git_command'
 require_relative 'todidnt/todo_line'
 
 class ToDidnt
   def initialize(path='.')
-    expanded_path = File.expand_path(path)
-
-    if File.exist?(File.join(expanded_path, '.git'))
-      @working_dir = expanded_path
-    else
-      raise "Whoops, #{expanded_path} is not a git repository!"
-    end
+    @repo = GitRepo.new(path)
   end
 
-  def run_in_working_directory(&blk)
-    if Dir.getwd != @working_dir
-      Dir.chdir(@working_dir) do
-        yield
-      end
-    else
-      yield
-    end
-  end
 
   def run
-    run_in_working_directory do
+    @repo.run do
       puts "Running in directory #{@working_dir}..."
-      lines = TodoLine.all(["TODO"])
+      lines = TodoLine.all(["ach-in"])
       puts "Found #{lines.count} TODOs. Blaming..."
 
       count = 0

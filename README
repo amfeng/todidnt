@@ -1,5 +1,8 @@
 TODO:
 
+- finish refactoring
+- tests
+- command line args
 - gem-ify
 - optimize blames
 - html report?
