@@ -2,33 +2,28 @@ require_relative 'todidnt/git_repo'
 require_relative 'todidnt/git_command'
 require_relative 'todidnt/todo_line'
 
-class ToDidnt
-  def initialize(path='.')
-    @repo = GitRepo.new(path)
-  end
+module ToDidnt
+  class Runner
+    def self.start(options)
+      path = options[:path]
+      GitRepo.new(path).run do
+        puts "Running in #{path || 'current directory'}..."
+        lines = TodoLine.all(["TODO"])
+        puts "Found #{lines.count} TODOs. Blaming..."
 
+        count = 0
+        lines.each do |todo|
+          todo.populate_blame
+          count += 1
+          STDOUT.write "\rBlamed: #{count}/#{lines.count}"
+        end
 
-  def run
-    @repo.run do
-      puts "Running in directory #{@working_dir}..."
-      lines = TodoLine.all(["ach-in"])
-      puts "Found #{lines.count} TODOs. Blaming..."
-
-      count = 0
-      lines.each do |todo|
-        todo.populate_blame
-        STDOUT.write "\rBlamed: #{count}/#{lines.count}"
-        count += 1
-      end
-
-      puts
-      puts "Results:"
-      lines.each do |line|
-        puts line.pretty
+        puts
+        puts "Results:"
+        lines.each do |line|
+          puts line.pretty
+        end
       end
     end
   end
 end
-
-#todidnt = ToDidnt.new('~/Stripe/pay-server')
-#todidnt.run
