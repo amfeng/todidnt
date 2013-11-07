@@ -6,14 +6,15 @@ module Todidnt
       if File.exist?(File.join(expanded_path, '.git'))
         @working_dir = expanded_path
       else
-        raise "Whoops, #{expanded_path} is not a git repository!"
+        $stderr.puts "Whoops, #{expanded_path} is not a git repository!"
+        exit
       end
     end
 
     def run(&blk)
       unless Dir.pwd == @working_dir
         Dir.chdir(@working_dir) do
-          yield
+          yield @working_dir
         end
       else
         yield

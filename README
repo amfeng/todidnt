@@ -2,8 +2,6 @@ TODO:
 
 - tests
 - actual logging that is not putsing
-- command line args
-- gem-ify
 - optimize blames
 - html report?
 - filter by person or time

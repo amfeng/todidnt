@@ -31,11 +31,6 @@ class TestTodoLine < Test
 
         TodoLine.all(['anything'])
       end
-
-      it 'truncates long content' do
-        # TODO
-        skip
-      end
     end
 
     describe 'functional' do

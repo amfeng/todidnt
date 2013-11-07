@@ -5,21 +5,17 @@ require_relative 'todidnt/todo_line'
 module Todidnt
   class Runner
     def self.start(options)
-      path = options[:path]
-      GitRepo.new(path).run do
+      GitRepo.new(options[:path]).run do |path|
         puts "Running in #{path || 'current directory'}..."
         lines = TodoLine.all(["TODO"])
         puts "Found #{lines.count} TODOs. Blaming..."
 
-        count = 0
-        lines.each do |todo|
+        lines.each_with_index do |todo, i|
           todo.populate_blame
-          count += 1
-          STDOUT.write "\rBlamed: #{count}/#{lines.count}"
+          $stdout.write "\rBlamed: #{i}/#{lines.count}"
         end
 
-        puts
-        puts "Results:"
+        puts "\nResults:"
         lines.each do |line|
           puts line.pretty
         end
