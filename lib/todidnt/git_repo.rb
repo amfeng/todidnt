@@ -1,4 +1,4 @@
-module ToDidnt
+module Todidnt
   class GitRepo
     def initialize(path)
       expanded_path = File.expand_path(path)

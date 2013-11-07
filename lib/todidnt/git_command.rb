@@ -1,4 +1,4 @@
-module ToDidnt
+module Todidnt
   class GitCommand
     def initialize(command, options)
       @command = command

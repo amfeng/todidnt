@@ -18,4 +18,4 @@ ARGV.options do |opts|
   opts.parse!
 end
 
-ToDidnt::Runner.start(options)
+Todidnt::Runner.start(options)

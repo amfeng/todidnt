@@ -2,7 +2,7 @@ require_relative 'todidnt/git_repo'
 require_relative 'todidnt/git_command'
 require_relative 'todidnt/todo_line'
 
-module ToDidnt
+module Todidnt
   class Runner
     def self.start(options)
       path = options[:path]

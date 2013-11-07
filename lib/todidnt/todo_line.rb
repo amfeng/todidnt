@@ -1,4 +1,4 @@
-module ToDidnt
+module Todidnt
   class TodoLine
     IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary}
 
