@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('mocha')
 
   s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- test/*`.split("\n")
+  s.test_files    = `git ls-files -- test/test_*.rb`.split("\n")
   s.executables   = ['todidnt']
   s.require_paths = %w[lib]
 end

@@ -1,6 +1,6 @@
-require_relative 'todidnt/git_repo'
-require_relative 'todidnt/git_command'
-require_relative 'todidnt/todo_line'
+require 'todidnt/git_repo'
+require 'todidnt/git_command'
+require 'todidnt/todo_line'
 
 module Todidnt
   class CLI

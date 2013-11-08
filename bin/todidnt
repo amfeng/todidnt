@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-
-require_relative '../lib/todidnt'
+require 'todidnt'
 
 options = {:path => '.'}
 command = ARGV.shift

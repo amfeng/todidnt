@@ -1,4 +1,4 @@
-require_relative 'lib'
+require 'lib'
 
 class TestTodoLine < Test
   before do
