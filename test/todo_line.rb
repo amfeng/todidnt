@@ -2,7 +2,7 @@ require_relative 'lib'
 
 class TestTodoLine < Test
   before do
-    GitCommand.any_instance.stubs(:run!)
+    Todidnt::GitCommand.any_instance.stubs(:run!)
   end
 
   describe '.all' do
@@ -11,38 +11,38 @@ class TestTodoLine < Test
         grep = mock()
         grep.stubs(:output_lines => [])
 
-        GitCommand.expects(:new).with(:grep, [['-n'], ['-e', 'hello']]).returns(grep)
-        TodoLine.all(['hello'])
+        Todidnt::GitCommand.expects(:new).with(:grep, [['-n'], ['-e', 'hello']]).returns(grep)
+        Todidnt::TodoLine.all(['hello'])
 
-        GitCommand.expects(:new).with(:grep, [['-n'], ['-e', 'hello'], ['-e', 'goodbye']]).returns(grep)
-        TodoLine.all(['hello', 'goodbye'])
+        Todidnt::GitCommand.expects(:new).with(:grep, [['-n'], ['-e', 'hello'], ['-e', 'goodbye']]).returns(grep)
+        Todidnt::TodoLine.all(['hello', 'goodbye'])
       end
 
       it 'creates a TodoLine object for each result line properly' do
-        GitCommand.any_instance.expects(:output_lines).returns(
+        Todidnt::GitCommand.any_instance.expects(:output_lines).returns(
           [
             'filename.rb:12:     content',
             'other_filename.rb:643:    TODO'
           ]
         )
 
-        TodoLine.expects(:new).with('filename.rb', 12, 'content')
-        TodoLine.expects(:new).with('other_filename.rb', 643, 'TODO')
+        Todidnt::TodoLine.expects(:new).with('filename.rb', 12, 'content')
+        Todidnt::TodoLine.expects(:new).with('other_filename.rb', 643, 'TODO')
 
-        TodoLine.all(['anything'])
+        Todidnt::TodoLine.all(['anything'])
       end
     end
 
     describe 'functional' do
       it 'returns a list of TodoLine objects as matches' do
-        GitCommand.any_instance.expects(:output_lines).returns(
+        Todidnt::GitCommand.any_instance.expects(:output_lines).returns(
           [
             'filename.rb:12:     content',
             'other_filename.rb:643:    TODO'
           ]
         )
 
-        todos = TodoLine.all(['anything'])
+        todos = Todidnt::TodoLine.all(['anything'])
         assert_equal 2, todos.count
 
         assert_equal 'filename.rb', todos.first.filename
@@ -55,14 +55,14 @@ class TestTodoLine < Test
       end
 
       it 'ignores lines matching IGNORE list' do
-        GitCommand.any_instance.expects(:output_lines).returns(
+        Todidnt::GitCommand.any_instance.expects(:output_lines).returns(
           [
             'filename.rb:12:     content',
             'thirdparty/other_filename.rb:643:    TODO'
           ]
         )
 
-        todos = TodoLine.all(['anything'])
+        todos = Todidnt::TodoLine.all(['anything'])
         assert_equal 1, todos.count
 
         assert_equal 'filename.rb', todos.first.filename
@@ -74,13 +74,35 @@ class TestTodoLine < Test
 
   describe '#populate_blame' do
     it 'constructs the correct `git blame` command' do
-      # TODO
-      skip
+      blame = mock()
+      blame.expects(:output_lines).returns([])
+      Todidnt::GitCommand.expects(:new).with(:blame,
+        [
+          ['--line-porcelain'],
+          ['-L', '50,50'],
+          ['filename.rb']
+        ]
+      ).returns(blame)
+
+      todo_line = Todidnt::TodoLine.new('filename.rb', 50, 'commit message')
+      todo_line.populate_blame
     end
 
     it 'sets author, timestamp properties on the TodoLine object' do
-      # TODO
-      skip
+      blame = mock()
+      blame.expects(:output_lines).returns(
+        %w{
+          39efeb14a9 1 1
+          author Amber Feng
+          author-time 1383882788
+          author-mail <amber.feng@gmail.com>,
+          summary Commit message,
+        }
+      )
+      Todidnt::GitCommand.expects(:new).returns(blame)
+
+      todo_line = Todidnt::TodoLine.new('filename.rb', 50, 'commit message')
+      todo_line.populate_blame
     end
   end
 end
