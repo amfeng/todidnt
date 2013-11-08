@@ -3,8 +3,21 @@ require_relative 'todidnt/git_command'
 require_relative 'todidnt/todo_line'
 
 module Todidnt
-  class Runner
-    def self.start(options)
+  class CLI
+    VALID_COMMANDS = %w{all}
+
+    def self.run(command, options)
+      if command && VALID_COMMANDS.include?(command)
+        self.send(command, options)
+      elsif command
+        $stderr.puts("Sorry, `#{command}` is not a valid command.")
+        exit
+      else
+        $stderr.puts("You must specify a command! Try `todidnt all`.")
+      end
+    end
+
+    def self.all(options)
       GitRepo.new(options[:path]).run do |path|
         puts "Running in #{path || 'current directory'}..."
         lines = TodoLine.all(["TODO"])

@@ -5,6 +5,8 @@ require 'optparse'
 require_relative '../lib/todidnt'
 
 options = {:path => '.'}
+command = ARGV.shift
+
 ARGV.options do |opts|
   opts.on('-p', '--path PATH', 'Git directory to run Todidnt in (default: current directory)') do |path|
     options[:path] = path
@@ -18,4 +20,4 @@ ARGV.options do |opts|
   opts.parse!
 end
 
-Todidnt::Runner.start(options)
+Todidnt::CLI.run(command, options)
