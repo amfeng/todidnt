@@ -4,7 +4,7 @@ Todidnt
 (:construction: This project is currently under construction! :construction:)
 
 Todidnt is a utility to help you track down TODOs and FIXMEs that you always
-said you'd do but haven't done yet. (:
+said you'd do but haven't done yet.
 
 Usage
 ----
@@ -13,7 +13,7 @@ Install the gem:
 
     gem install todidnt
 
-Then, run `todidnt` in any Git repository:
+Then, run `todidnt` in any Git repository directory:
 
     $ todidnt
 
@@ -26,7 +26,7 @@ TODO[1]
 - Fancy formatted reports
 - TODO stats
 
-Credits
+Credit
 ----
 
 Paul Battley (@threedaymonk) for initial idea/implementation and witty name.
