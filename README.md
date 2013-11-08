@@ -21,7 +21,6 @@ TODO[1]
 ----
 
 - Optimizing blame step
-- Filtering by "overdue" TODOs
 - Filtering by author, label
 - Fancy formatted reports
 - TODO stats
