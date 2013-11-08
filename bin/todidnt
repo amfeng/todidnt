@@ -11,6 +11,10 @@ ARGV.options do |opts|
     options[:path] = path
   end
 
+  opts.on('-d', '--date STRING', 'Fuzzy string for overdue date comparison, e.g. last week or 7/2/2013 (default: today)') do |date|
+    options[:date] = date
+  end
+
   opts.on_tail('-h', '--help', 'Show this message') do
     puts opts
     exit

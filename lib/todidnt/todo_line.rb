@@ -2,7 +2,7 @@ module Todidnt
   class TodoLine
     IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary}
 
-    attr_reader :filename, :line_number, :content, :author
+    attr_reader :filename, :line_number, :content, :author, :timestamp
 
     def self.all(expressions)
       options = [['-n']]

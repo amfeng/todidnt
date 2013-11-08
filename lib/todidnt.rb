@@ -2,9 +2,11 @@ require 'todidnt/git_repo'
 require 'todidnt/git_command'
 require 'todidnt/todo_line'
 
+require 'chronic'
+
 module Todidnt
   class CLI
-    VALID_COMMANDS = %w{all}
+    VALID_COMMANDS = %w{all overdue}
 
     def self.run(command, options)
       if command && VALID_COMMANDS.include?(command)
@@ -18,6 +20,38 @@ module Todidnt
     end
 
     def self.all(options)
+      all_lines = self.all_lines(options)
+
+      puts "\nResults:"
+      all_lines.sort_by do |line|
+        line.timestamp
+      end.each do |line|
+        puts line.pretty
+      end
+    end
+
+    def self.overdue(options)
+      date = Chronic.parse(options[:date] || 'now', :context => :past)
+      if date.nil?
+        $stderr.puts("Invalid date passed: #{options[:date]}")
+        exit
+      else
+        puts "Finding overdue TODOs (created before #{date.strftime('%F')})..."
+      end
+
+      all_lines = self.all_lines(options)
+
+      puts "\nResults:"
+      all_lines.sort_by do |line|
+        line.timestamp
+      end.select do |line|
+        line.timestamp < date.to_i
+      end.each do |line|
+        puts line.pretty
+      end
+    end
+
+    def self.all_lines(options)
       GitRepo.new(options[:path]).run do |path|
         puts "Running in #{path || 'current directory'}..."
         lines = TodoLine.all(["TODO"])
@@ -28,10 +62,7 @@ module Todidnt
           $stdout.write "\rBlamed: #{i}/#{lines.count}"
         end
 
-        puts "\nResults:"
-        lines.each do |line|
-          puts line.pretty
-        end
+        lines
       end
     end
   end
