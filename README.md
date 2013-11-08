@@ -1,7 +1,7 @@
 Todidnt
 ====
 
-(This project is currently under construction! :construction:)
+(:construction: This project is currently under construction! :construction:)
 
 Todidnt is a utility to help you track down TODOs and FIXMEs that you always
 said you'd do but haven't done yet. (:
