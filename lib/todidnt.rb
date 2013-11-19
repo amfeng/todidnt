@@ -72,22 +72,18 @@ module Todidnt
 
         todos = {}
 
-        name, email, time = nil
-        patch_additions = nil
-        patch_deletions = nil
+        patch_additions = ''
+        patch_deletions = ''
         next_deletions = []
-        log.output_lines.each do |line|
-          if (summary = /COMMIT (.*) (.*) (.*)/.match(line))
-            if email
-              todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
-            end
-
-            # We're on a new commit now
+        log.output_lines.reverse.each do |line|
+          if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
             name = summary[1]
             email = summary[2]
             time = summary[3]
 
             todos[email] ||= []
+            todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
+
             patch_additions = ''
             patch_deletions = ''
           elsif (diff = /^\+(.*)/.match(line))
@@ -96,7 +92,6 @@ module Todidnt
             patch_deletions << diff[1]
           end
         end
-        todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
 
         puts todos.inspect
       end
