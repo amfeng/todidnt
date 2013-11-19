@@ -65,5 +65,41 @@ module Todidnt
         lines
       end
     end
+
+    def self.history(options)
+      GitRepo.new(options[:path]).run do |path|
+        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
+
+        todos = {}
+
+        name, email, time = nil
+        patch_additions = nil
+        patch_deletions = nil
+        next_deletions = []
+        log.output_lines.each do |line|
+          if (summary = /COMMIT (.*) (.*) (.*)/.match(line))
+            if email
+              todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
+            end
+
+            # We're on a new commit now
+            name = summary[1]
+            email = summary[2]
+            time = summary[3]
+
+            todos[email] ||= []
+            patch_additions = ''
+            patch_deletions = ''
+          elsif (diff = /^\+(.*)/.match(line))
+            patch_additions << diff[1]
+          elsif (diff = /^\-(.*)/.match(line))
+            patch_deletions << diff[1]
+          end
+        end
+        todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
+
+        puts todos.inspect
+      end
+    end
   end
 end
