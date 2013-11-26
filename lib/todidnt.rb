@@ -70,19 +70,18 @@ module Todidnt
       GitRepo.new(options[:path]).run do |path|
         log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
 
-        todos = {}
+        history_by_author = {}
 
         patch_additions = ''
         patch_deletions = ''
-        next_deletions = []
         log.output_lines.reverse.each do |line|
           if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
             name = summary[1]
             email = summary[2]
             time = summary[3]
 
-            todos[email] ||= []
-            todos[email] << [time, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
+            history_by_author[email] ||= []
+            history_by_author[email] << [time.to_i, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
 
             patch_additions = ''
             patch_deletions = ''
@@ -93,7 +92,54 @@ module Todidnt
           end
         end
 
-        puts todos.inspect
+        min_commit_date = Time.at(history_by_author.map {|author, history| history}[0].map(&:first).min)
+
+        interval = 86400
+        original_interval_start = Time.new(min_commit_date.year, min_commit_date.month, min_commit_date.day).to_i
+        interval_start = original_interval_start
+        interval_end = interval_start + interval
+
+        history_by_author.each do |author, history|
+          buckets = []
+          current_total = 0
+          interval_start = original_interval_start
+
+          i = 0
+          while i < history.length
+            should_increment = false
+            slice = history[i]
+
+            # Does the current slice exist inside the bucket we're currently
+            # in? If so, add it to the total, and go to the next slice.
+            if slice[0] >= interval_start && slice[0] < interval_end
+              current_total += (slice[1] - slice[2])
+              should_increment = true
+            end
+
+            # If we're on the last slice, or the next slice would have been
+            # in a new bucket, finish the current bucket.
+            if i == (history.length - 1) || history[i + 1][0] >= interval_end
+              buckets << [interval_start, current_total]
+              interval_start += interval
+              interval_end += interval
+            end
+
+            i += 1 if should_increment
+          end
+
+          history_by_author[author] = buckets
+        end
+
+        history_by_author.each do |author, history|
+          puts "For #{author}:"
+
+          history.each do |slice|
+            print "#{Time.at(slice[0])} |"
+            print "*"*([0, slice[1]].max)
+            print " (#{slice[1]})"
+            print "\n"
+          end
+        end
       end
     end
   end
