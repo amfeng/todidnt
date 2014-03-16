@@ -28,6 +28,7 @@ module Todidnt
       options = [
         ['--line-porcelain'],
         ['-L', "#{@line_number},#{@line_number}"],
+        ['-w'],
         [@filename]
       ]
 
