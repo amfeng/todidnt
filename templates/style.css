@@ -9,6 +9,16 @@ body {
   color: #444;
 }
 
+body a {
+  color: #5F8EB3;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+body a:hover {
+  text-decoration: underline;
+}
+
 header {
   background: #333;
   color: #fff;
@@ -22,4 +32,8 @@ header h1 {
 
 section.content {
   padding: 30px;
+}
+
+footer {
+  text-align: center;
 }
