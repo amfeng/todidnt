@@ -6,7 +6,7 @@ require 'chronic'
 
 module Todidnt
   class CLI
-    VALID_COMMANDS = %w{all overdue}
+    VALID_COMMANDS = %w{all overdue history}
 
     def self.run(command, options)
       if command && VALID_COMMANDS.include?(command)
@@ -68,10 +68,11 @@ module Todidnt
 
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        log = GitCommand.new(:log, [['-G', 'multi-subs'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
+        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
 
         history_by_author = {}
 
+        puts "Going through log..."
         patch_additions = ''
         patch_deletions = ''
         total = log.output_lines.count
@@ -82,7 +83,11 @@ module Todidnt
             time = summary[3]
 
             history_by_author[email] ||= []
-            history_by_author[email] << [time.to_i, patch_additions.scan('TODO').count, patch_deletions.scan('TODO').count]
+            history_by_author[email] << {
+              :timestamp => time.to_i,
+              :additions => patch_additions.scan('TODO').count,
+              :deletions => patch_deletions.scan('TODO').count
+            }
 
             patch_additions = ''
             patch_deletions = ''
@@ -93,55 +98,45 @@ module Todidnt
           end
         end
 
-        puts "DONE"
-
-        puts history_by_author.inspect
-        return
-
-        min_commit_date = Time.at(history_by_author.map {|author, history| history}[0].map(&:first).min)
+        min_commit_date = Time.at(history_by_author.map {|author, history| history}.first.map {|d| d[:timestamp]}.min)
 
         interval = 86400
         original_interval_start = Time.new(min_commit_date.year, min_commit_date.month, min_commit_date.day).to_i
         interval_start = original_interval_start
         interval_end = interval_start + interval
 
+        puts "Finalizing timeline..."
         history_by_author.each do |author, history|
           buckets = []
           current_total = 0
           interval_start = original_interval_start
+          interval_end = interval_start + interval
 
           i = 0
-          blah = 0
-          history = history.sort_by {|slice| slice[0]}
+          history = history.sort_by {|slice| slice[:timestamp]}
           while i < history.length
-            puts "while! #{i}"
             should_increment = false
             slice = history[i]
 
             # Does the current slice exist inside the bucket we're currently
             # in? If so, add it to the total, and go to the next slice.
-            if slice[0] >= interval_start && slice[0] < interval_end
-              current_total += (slice[1] - slice[2])
-              puts "#{i}: #{current_total}"
+            if slice[:timestamp] >= interval_start && slice[:timestamp] < interval_end
+              current_total += (slice[:additions] - slice[:deletions])
               should_increment = true
             end
 
-            puts slice[0]
-            puts interval_start
-            puts interval_end
-
             # If we're on the last slice, or the next slice would have been
             # in a new bucket, finish the current bucket.
-            if i == (history.length - 1) || history[i + 1][0] >= interval_end
-              puts "NEW BUCKET"
-              buckets << [interval_start, current_total]
+            if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
+              buckets << {
+                :timestamp => interval_start,
+                :total => current_total
+              }
               interval_start += interval
               interval_end += interval
             end
 
             i += 1 if should_increment
-            blah += 1 if i == 32
-            return if blah > 300
           end
 
           history_by_author[author] = buckets
@@ -151,9 +146,9 @@ module Todidnt
           puts "For #{author}:"
 
           history.each do |slice|
-            print "#{Time.at(slice[0])} |"
-            print "*"*([0, slice[1]].max)
-            print " (#{slice[1]})"
+            print "#{Time.at(slice[:timestamp])} |"
+            print "*"*([0, slice[:total]].max / 10)
+            print " (#{slice[:total]})"
             print "\n"
           end
         end
