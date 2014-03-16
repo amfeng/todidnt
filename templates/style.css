@@ -1,3 +1,5 @@
+/* Global */
+
 html, body {
   margin: 0;
   padding: 0;
@@ -19,6 +21,8 @@ body a:hover {
   text-decoration: underline;
 }
 
+/* Layout */
+
 header {
   background: #333;
   color: #fff;
@@ -36,4 +40,71 @@ section.content {
 
 footer {
   text-align: center;
+  padding: 15px;
+}
+
+/* TODO Lines */
+
+section div.line {
+  width: 100%;
+}
+
+section div.line div {
+  display: inline-block;
+  height: 20px;
+  line-height: 20px;
+
+  padding: 10px 10px;
+  margin: 2px 0;
+
+  border-style: solid;
+  border-width: 1px 1px 5px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+section div.line div.meta {
+  background: #B1D2E3;
+  border-color: #A1C3D6;
+  border-radius: 2px 0px 0px 2px;
+
+  font-weight: bold;
+
+  width: 35%;
+}
+
+section div.line div.content {
+  background: #f6f6f6;
+  border-color: #eee;
+  border-radius: 0 2px 3px 0;
+
+  font-family: 'Monaco', serif;
+  font-size: 0.8em;
+
+  position: relative;
+  left: -5px;
+  z-index: -1;
+  padding-left: 15px;
+
+  width: 60%;
+}
+
+section div.line:hover div.meta {
+  background: #A1C3D6;
+  border-color: #95B9CC;
+}
+
+section div.line:hover div.content{
+  background: #eee;
+  border-color: #dedede;
+}
+
+section div.line div.meta span {
+  margin-right: 10px;
+}
+
+section div.line div.meta span:last-child {
+  margin-right: 0;
 }

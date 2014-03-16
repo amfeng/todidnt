@@ -1,9 +1,13 @@
 <% for line in all_lines %>
   <div class='line'>
-    <span><%= line.pretty_time %></span>
-    <span><%= line.author %></span>
-    <span><%= line.filename %>:<%= line.line_number %></span>
-    <span><%= line.content %></span>
+    <div class='meta'>
+      <span class='date'><%= line.pretty_time %></span>
+      <span class='author'><%= line.author %></span>
+      <span class='file'><a href='<%= line.filename %>'><%= line.filename %>:<%= line.line_number %></a></span>
+    </div>
+    <div class='content'>
+      <span><%= line.content %></span>
+    </div>
   </div>
 <% end %>
 
