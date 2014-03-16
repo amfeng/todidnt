@@ -3,6 +3,8 @@ require 'todidnt/git_command'
 require 'todidnt/todo_line'
 
 require 'chronic'
+require 'erb'
+require 'launchy'
 
 module Todidnt
   class CLI
@@ -28,6 +30,18 @@ module Todidnt
       end.each do |line|
         puts line.pretty
       end
+
+      render_and_open_all(all_lines)
+    end
+
+    def self.render_and_open_all(all_lines)
+      template = ERB.new(File.read('templates/all.erb'))
+
+      File.open('todidnt-all.html', 'w') do |file|
+        file.write(template.result(binding))
+      end
+
+      Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
     end
 
     def self.overdue(options)
