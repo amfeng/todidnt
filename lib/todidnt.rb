@@ -68,12 +68,13 @@ module Todidnt
 
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
+        log = GitCommand.new(:log, [['-G', 'multi-subs'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
 
         history_by_author = {}
 
         patch_additions = ''
         patch_deletions = ''
+        total = log.output_lines.count
         log.output_lines.reverse.each do |line|
           if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
             name = summary[1]
@@ -92,6 +93,11 @@ module Todidnt
           end
         end
 
+        puts "DONE"
+
+        puts history_by_author.inspect
+        return
+
         min_commit_date = Time.at(history_by_author.map {|author, history| history}[0].map(&:first).min)
 
         interval = 86400
@@ -105,7 +111,10 @@ module Todidnt
           interval_start = original_interval_start
 
           i = 0
+          blah = 0
+          history = history.sort_by {|slice| slice[0]}
           while i < history.length
+            puts "while! #{i}"
             should_increment = false
             slice = history[i]
 
@@ -113,18 +122,26 @@ module Todidnt
             # in? If so, add it to the total, and go to the next slice.
             if slice[0] >= interval_start && slice[0] < interval_end
               current_total += (slice[1] - slice[2])
+              puts "#{i}: #{current_total}"
               should_increment = true
             end
+
+            puts slice[0]
+            puts interval_start
+            puts interval_end
 
             # If we're on the last slice, or the next slice would have been
             # in a new bucket, finish the current bucket.
             if i == (history.length - 1) || history[i + 1][0] >= interval_end
+              puts "NEW BUCKET"
               buckets << [interval_start, current_total]
               interval_start += interval
               interval_end += interval
             end
 
             i += 1 if should_increment
+            blah += 1 if i == 32
+            return if blah > 300
           end
 
           history_by_author[author] = buckets
