@@ -3,6 +3,7 @@ ruby '1.9.3'
 
 gem 'chronic'
 gem 'launchy'
+gem 'tilt'
 
 group 'test' do
   gem 'minitest'

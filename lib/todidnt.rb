@@ -5,6 +5,7 @@ require 'todidnt/todo_line'
 require 'chronic'
 require 'erb'
 require 'launchy'
+require 'tilt'
 
 module Todidnt
   class CLI
@@ -30,10 +31,14 @@ module Todidnt
     end
 
     def self.render_and_open_all(all_lines)
-      template = ERB.new(File.read('templates/all.erb'))
+      content_template = Tilt::ERBTemplate.new('templates/all.erb')
+      layout_template = Tilt::ERBTemplate.new('templates/layout.erb')
+
+      content = content_template.render nil, :all_lines => all_lines
+      result = layout_template.render { content }
 
       File.open('todidnt-all.html', 'w') do |file|
-        file.write(template.result(binding))
+        file.write(result)
       end
 
       Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")

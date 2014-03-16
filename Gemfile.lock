@@ -9,6 +9,7 @@ GEM
     minitest (5.0.8)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
+    tilt (2.0.0)
 
 PLATFORMS
   ruby
@@ -18,3 +19,4 @@ DEPENDENCIES
   launchy
   minitest
   mocha
+  tilt
