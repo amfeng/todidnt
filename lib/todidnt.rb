@@ -22,14 +22,9 @@ module Todidnt
     end
 
     def self.all(options)
-      all_lines = self.all_lines(options)
+      all_lines = self.all_lines(options).sort_by(&:timestamp)
 
-      puts "\nResults:"
-      all_lines.sort_by do |line|
-        line.timestamp
-      end.each do |line|
-        puts line.pretty
-      end
+      puts "\nOpening results..."
 
       render_and_open_all(all_lines)
     end

@@ -1,4 +1,6 @@
 <h1>Todidnt</h1>
 
-<%= all_lines.map(&:pretty) %>
+<% for line in all_lines %>
+  <div><%= line.pretty %></div>
+<% end %>
 
