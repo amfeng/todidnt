@@ -41,6 +41,10 @@ module Todidnt
         file.write(result)
       end
 
+      File.open('style.css', 'w') do |file|
+        file.write(File.read('templates/style.css'))
+      end
+
       Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
     end
 

@@ -1,0 +1,25 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Helvetica Neue, Arial, san-serif;
+  font-size: 0.9em;
+  color: #444;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 10px 30px;
+}
+
+header h1 {
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+}
+
+section.content {
+  padding: 30px;
+}

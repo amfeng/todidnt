@@ -1,6 +1,9 @@
-<h1>Todidnt</h1>
-
 <% for line in all_lines %>
-  <div><%= line.pretty %></div>
+  <div class='line'>
+    <span><%= line.pretty_time %></span>
+    <span><%= line.author %></span>
+    <span><%= line.filename %>:<%= line.line_number %></span>
+    <span><%= line.content %></span>
+  </div>
 <% end %>
 
