@@ -1,3 +1,14 @@
+<div class='controls'>
+  <div class='filter'>
+    Filter by:
+    <select data-placeholder='Author' id='author'>
+      <% for author in all_lines.map(&:author).uniq %>
+        <option><%= author %></option>
+      <% end %>
+    </select>
+  </div>
+</div>
+
 <% for line in all_lines %>
   <div class='line'>
     <div class='meta'>
@@ -10,4 +21,24 @@
     </div>
   </div>
 <% end %>
+
+<script type='text/javascript'>
+  $(document).ready(function() {
+    $('select#author').chosen();
+
+    $('select#author').change(function() {
+      selectedValue = $(this).val();
+      $('div.line').each(function(i, line) {
+        lineElement = $(line);
+        var author = lineElement.find($('span.author')).text();
+
+        if (author === selectedValue) {
+          lineElement.show();
+        } else {
+          lineElement.hide();
+        }
+      });
+    });
+  });
+</script>
 

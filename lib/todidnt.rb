@@ -46,6 +46,18 @@ module Todidnt
         file.write(File.read(path_to + 'templates/style.css'))
       end
 
+      File.open('jquery-2.1.0.min.js', 'w') do |file|
+        file.write(File.read(path_to + 'templates/jquery-2.1.0.min.js'))
+      end
+
+      File.open('chosen.jquery.min.js', 'w') do |file|
+        file.write(File.read(path_to + 'templates/chosen.jquery.min.js'))
+      end
+
+      File.open('chosen.min.css', 'w') do |file|
+        file.write(File.read(path_to + 'templates/chosen.min.css'))
+      end
+
       Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
     end
 

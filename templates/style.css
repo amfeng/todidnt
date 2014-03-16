@@ -45,6 +45,14 @@ footer {
 
 /* TODO Lines */
 
+section div.controls {
+  padding-bottom: 20px;
+}
+
+section div.controls div.filter select {
+  width: 150px;
+}
+
 section div.line {
   width: 100%;
 }
