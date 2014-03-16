@@ -31,8 +31,9 @@ module Todidnt
     end
 
     def self.render_and_open_all(all_lines)
-      content_template = Tilt::ERBTemplate.new('templates/all.erb')
-      layout_template = Tilt::ERBTemplate.new('templates/layout.erb')
+      path_to = File.join(File.dirname(File.expand_path(__FILE__)), '../')
+      content_template = Tilt::ERBTemplate.new(path_to + 'templates/all.erb')
+      layout_template = Tilt::ERBTemplate.new(path_to + 'templates/layout.erb')
 
       content = content_template.render nil, :all_lines => all_lines
       result = layout_template.render { content }
@@ -42,7 +43,7 @@ module Todidnt
       end
 
       File.open('style.css', 'w') do |file|
-        file.write(File.read('templates/style.css'))
+        file.write(File.read(path_to + 'templates/style.css'))
       end
 
       Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
