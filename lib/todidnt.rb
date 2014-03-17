@@ -28,12 +28,8 @@ module Todidnt
 
       puts "\nOpening results..."
 
-      render_and_open_all(all_lines)
-    end
-
-    def self.render_and_open_all(all_lines)
-      HTMLGenerator.render(:all, :all_lines => all_lines)
-      Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
+      file_path = HTMLGenerator.generate(:all, :all_lines => all_lines)
+      Launchy.open("file://#{file_path}")
     end
 
     def self.overdue(options)
