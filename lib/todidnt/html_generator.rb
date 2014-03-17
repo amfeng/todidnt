@@ -9,7 +9,7 @@ module Todidnt
     DESTINATION_PATH = '.todidnt'
 
     def self.generate_common
-      FileUtils.mkdir(DESTINATION_PATH)
+      Dir.mkdir(DESTINATION_PATH) unless Dir.exists?(DESTINATION_PATH)
 
       COMMON_FILES.each do |file|
         FileUtils.cp(
