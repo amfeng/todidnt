@@ -4,19 +4,30 @@ require 'fileutils'
 
 module Todidnt
   class HTMLGenerator
-    SOURCE_PATH = File.join(File.dirname(File.expand_path(__FILE__)), '../../templates')
+    SOURCE_PATH = File.join(
+      File.dirname(File.expand_path(__FILE__)),
+      '../../templates'
+    )
     DESTINATION_PATH = '.todidnt'
 
     def self.generate_common
+      # Create the destination folder unless it already exists.
       Dir.mkdir(DESTINATION_PATH) unless Dir.exists?(DESTINATION_PATH)
 
-      %w{js css}.each do |dir|
-        Dir.foreach(dir) do |file|
-          FileUtils.cp(
-            source_path(file),
-            destination_path(file)
-          )
+      # Copy over directories (e.g. js, css) to the destination.
+      common_dirs = []
+      Dir.chdir('templates') do
+        common_dirs = Dir.glob('*').select do |dir|
+          File.directory?(dir)
         end
+      end
+
+      common_dirs.each do |dir|
+        FileUtils.cp_r(
+          source_path(dir),
+          destination_path,
+          :remove_destination => true
+        )
       end
     end
 
@@ -37,12 +48,12 @@ module Todidnt
       File.absolute_path(file_name)
     end
 
-    def self.source_path(path)
-      "#{SOURCE_PATH}/#{path}"
+    def self.source_path(path=nil)
+      path ? "#{SOURCE_PATH}/#{path}" : SOURCE_PATH
     end
 
-    def self.destination_path(path)
-      "#{DESTINATION_PATH}/#{path}"
+    def self.destination_path(path=nil)
+      path ? "#{DESTINATION_PATH}/#{path}" : DESTINATION_PATH
     end
 
     def self.from_template(template)
