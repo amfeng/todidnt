@@ -2,6 +2,7 @@
   <div class='filter'>
     Filter by:
     <select data-placeholder='Author' id='author'>
+      <option></option>
       <% for author in all_lines.map(&:author).uniq %>
         <option><%= author %></option>
       <% end %>
