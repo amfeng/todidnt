@@ -29,18 +29,45 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("data.csv", function(error, data) {
-  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "State"; }));
+  var data = [
+    {
+      'Amber': 2,
+      'Carl' : 3,
+      'Date' : 1
+    },
+    {
+      'Amber': 5,
+      'Carl' : 2,
+      'Date' : 2
+    },
+    {
+      'Amber': 8,
+      'Carl' : 4,
+      'Date' : 3
+    },
+    {
+      'Amber': 8,
+      'Carl' : 4,
+      'Date' : 4
+    }
+  ];
+
+
+  color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Date"; }));
 
   data.forEach(function(d) {
     var y0 = 0;
-    d.ages = color.domain().map(function(name) { return {name: name, y0: y0, y1: y0 += +d[name]}; });
+    d.ages = color.domain().map(function(name) {
+      return {
+        name: name,
+        y0: y0,
+        y1: y0 += +d[name]
+      };
+    });
     d.total = d.ages[d.ages.length - 1].y1;
   });
 
-  data.sort(function(a, b) { return b.total - a.total; });
-
-  x.domain(data.map(function(d) { return d.State; }));
+  x.domain(data.map(function(d) { return d.Date; }));
   y.domain([0, d3.max(data, function(d) { return d.total; })]);
 
   svg.append("g")
@@ -56,13 +83,13 @@ d3.csv("data.csv", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Population");
+      .text("TODOs");
 
   var state = svg.selectAll(".state")
       .data(data)
     .enter().append("g")
       .attr("class", "g")
-      .attr("transform", function(d) { return "translate(" + x(d.State) + ",0)"; });
+      .attr("transform", function(d) { return "translate(" + x(d.Date) + ",0)"; });
 
   state.selectAll("rect")
       .data(function(d) { return d.ages; })
@@ -90,7 +117,5 @@ d3.csv("data.csv", function(error, data) {
       .attr("dy", ".35em")
       .style("text-anchor", "end")
       .text(function(d) { return d; });
-
-});
 
 </script>
