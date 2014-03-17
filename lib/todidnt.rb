@@ -4,7 +4,6 @@ require 'todidnt/todo_line'
 require 'todidnt/html_generator'
 
 require 'chronic'
-require 'erb'
 require 'launchy'
 
 module Todidnt
