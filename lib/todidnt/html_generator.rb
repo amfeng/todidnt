@@ -4,18 +4,19 @@ require 'fileutils'
 
 module Todidnt
   class HTMLGenerator
-    COMMON_FILES = %w{style.css jquery-2.1.0.min.js chosen.jquery.min.js chosen.min.css}
     SOURCE_PATH = File.join(File.dirname(File.expand_path(__FILE__)), '../../templates')
     DESTINATION_PATH = '.todidnt'
 
     def self.generate_common
       Dir.mkdir(DESTINATION_PATH) unless Dir.exists?(DESTINATION_PATH)
 
-      COMMON_FILES.each do |file|
-        FileUtils.cp(
-          source_path(file),
-          destination_path(file)
-        )
+      %w{js css}.each do |dir|
+        Dir.foreach(dir) do |file|
+          FileUtils.cp(
+            source_path(file),
+            destination_path(file)
+          )
+        end
       end
     end
 
