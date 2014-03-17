@@ -12,12 +12,16 @@
 <% for line in all_lines %>
   <div class='line'>
     <div class='meta'>
-      <span class='date'><%= line.pretty_time %></span>
-      <span class='author'><%= line.author %></span>
-      <span class='file'><a href='<%= line.filename %>'><%= line.filename %>:<%= line.line_number %></a></span>
+      <div class='padding'>
+        <span class='date'><%= line.pretty_time %></span>
+        <span class='author'><%= line.author %></span>
+        <span class='file'><a href='<%= line.filename %>'><%= line.filename %>:<%= line.line_number %></a></span>
+      </div>
     </div>
     <div class='content'>
-      <span><%= ERB::Util.html_escape(line.content) %></span>
+      <div class='padding'>
+        <span><%= ERB::Util.html_escape(line.content) %></span>
+      </div>
     </div>
   </div>
 <% end %>
