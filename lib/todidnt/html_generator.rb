@@ -16,7 +16,7 @@ module Todidnt
 
       # Copy over directories (e.g. js, css) to the destination.
       common_dirs = []
-      Dir.chdir('templates') do
+      Dir.chdir(SOURCE_PATH) do
         common_dirs = Dir.glob('*').select do |dir|
           File.directory?(dir)
         end
