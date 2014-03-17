@@ -32,7 +32,7 @@ module Todidnt
       end
     end
 
-    def self.generate(template, context)
+    def self.generate(template, context={})
       generate_common
 
       content_template = from_template(template)

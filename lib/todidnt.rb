@@ -153,6 +153,9 @@ module Todidnt
           end
         end
       end
+
+      file_path = HTMLGenerator.generate(:history)
+      Launchy.open("file://#{file_path}")
     end
   end
 end
