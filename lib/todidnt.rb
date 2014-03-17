@@ -1,6 +1,7 @@
 require 'todidnt/git_repo'
 require 'todidnt/git_command'
 require 'todidnt/todo_line'
+require 'todidnt/html_generator'
 
 require 'chronic'
 require 'erb'
@@ -31,33 +32,7 @@ module Todidnt
     end
 
     def self.render_and_open_all(all_lines)
-      path_to = File.join(File.dirname(File.expand_path(__FILE__)), '../')
-      content_template = Tilt::ERBTemplate.new(path_to + 'templates/all.erb')
-      layout_template = Tilt::ERBTemplate.new(path_to + 'templates/layout.erb')
-
-      content = content_template.render nil, :all_lines => all_lines
-      result = layout_template.render { content }
-
-      File.open('todidnt-all.html', 'w') do |file|
-        file.write(result)
-      end
-
-      File.open('style.css', 'w') do |file|
-        file.write(File.read(path_to + 'templates/style.css'))
-      end
-
-      File.open('jquery-2.1.0.min.js', 'w') do |file|
-        file.write(File.read(path_to + 'templates/jquery-2.1.0.min.js'))
-      end
-
-      File.open('chosen.jquery.min.js', 'w') do |file|
-        file.write(File.read(path_to + 'templates/chosen.jquery.min.js'))
-      end
-
-      File.open('chosen.min.css', 'w') do |file|
-        file.write(File.read(path_to + 'templates/chosen.min.css'))
-      end
-
+      HTMLGenerator.render(:all, :all_lines => all_lines)
       Launchy.open("file://#{File.absolute_path('todidnt-all.html')}")
     end
 

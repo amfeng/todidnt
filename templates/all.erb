@@ -17,7 +17,7 @@
       <span class='file'><a href='<%= line.filename %>'><%= line.filename %>:<%= line.line_number %></a></span>
     </div>
     <div class='content'>
-      <span><%= line.content %></span>
+      <span><%= ERB::Util.html_escape(line.content) %></span>
     </div>
   </div>
 <% end %>

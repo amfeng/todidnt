@@ -12,5 +12,5 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- test/test_*.rb`.split("\n")
   s.executables   = ['todidnt']
-  s.require_paths = %w[lib]
+  s.require_paths = ['lib']
 end
