@@ -6,7 +6,6 @@ require 'todidnt/html_generator'
 require 'chronic'
 require 'erb'
 require 'launchy'
-require 'tilt'
 
 module Todidnt
   class CLI
