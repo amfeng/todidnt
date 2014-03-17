@@ -1,9 +1,14 @@
 module Todidnt
   class HTMLGenerator
-    COMMON_FILES = %w{style.css, jquery-2.1.0.min.js, chosen.jquery.min.js, chosen.min.css}
+    COMMON_FILES = %w{style.css jquery-2.1.0.min.js chosen.jquery.min.js chosen.min.css}
+    PATH_TO = File.join(File.dirname(File.expand_path(__FILE__)), '../..')
 
-    def self.path_to
-      File.join(File.dirname(File.expand_path(__FILE__)), '../..')
+    def self.path_to(path)
+      "#{PATH_TO}/#{path}"
+    end
+
+    def self.from_template(template)
+      Tilt::ERBTemplate.new(path_to("templates/#{template}.erb"))
     end
 
     def self.common
@@ -13,15 +18,13 @@ module Todidnt
     end
 
     def self.render(template, context)
-      template_name = template.to_s
+      content_template = from_template(template)
+      layout_template = from_template(:layout)
 
-      content_template = Tilt::ERBTemplate.new("#{path_to}/templates/#{template_name}.erb")
-      layout_template = Tilt::ERBTemplate.new("#{path_to}/templates/layout.erb")
+      inner_content = content_template.render nil, context
+      result = layout_template.render { inner_content }
 
-      content = content_template.render nil, context
-      result = layout_template.render { content }
-
-      File.open("todidnt_#{template_name}.html", 'w') do |file|
+      File.open("todidnt_#{template}.html", 'w') do |file|
         file.write(result)
       end
     end
