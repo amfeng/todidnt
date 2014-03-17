@@ -9,6 +9,9 @@ body {
   font-family: Helvetica Neue, Arial, san-serif;
   font-size: 0.9em;
   color: #444;
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 body a {
