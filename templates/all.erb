@@ -1,22 +1,56 @@
-<div class='controls'>
-  <div class='filter'>
-    Filter by:
-    <select data-placeholder='Author' id='author'>
-      <option></option>
-      <% for author in all_lines.map(&:author).uniq %>
-        <option><%= author %></option>
-      <% end %>
-    </select>
-  </div>
-</div>
-
-<div id="all">
-</div>
+<div id='all'></div>
 
 <script type="text/jsx">
   /** @jsx React.DOM */
 
   var lines = <%= all_lines.map(&:to_hash).to_json %>;
+
+  var FilterableTODOList = React.createClass({
+    render: function() {
+      return (
+        <div className='filterable-todo-list'>
+          <TODOFilters lines={this.props.lines} />
+          <TODOLineList lines={this.props.lines} />
+        </div>
+      );
+    }
+  });
+
+  var TODOFilters = React.createClass({
+    authors: function() {
+      return _.uniq(
+        _.map(this.props.lines, function(line) { return line.author; })
+      );
+    },
+
+    render: function() {
+      var authorFilter = <TODOSelectFilter field='author' options={this.authors()} />;
+
+      return (
+        <div className='controls'>
+          <div className='filters'>
+            Filter by:
+            {authorFilter}
+          </div>
+        </div>
+      );
+    }
+  });
+
+  var TODOSelectFilter = React.createClass({
+    render: function() {
+      selectOptions = []
+      this.props.options.forEach(function(option) {
+        selectOptions.push(<option>{option}</option>);
+      });
+
+      return (
+        <select data-placeholder={this.props.field} id={this.props.field}>
+          {selectOptions}
+        </select>
+      );
+    }
+  });
 
   var TODOLineList = React.createClass({
     render: function() {
@@ -35,7 +69,6 @@
 
   var TODOLine = React.createClass({
     render: function() {
-      console.log(this);
       return (
         <div className='line'>
           <div className='meta'>
@@ -60,7 +93,7 @@
   });
 
   $(document).ready(function() {
-    React.renderComponent(<TODOLineList lines={lines} />, document.getElementById('all'));
+    React.renderComponent(<FilterableTODOList lines={lines} />, document.getElementById('all'));
   });
 </script>
 
