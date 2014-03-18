@@ -49,5 +49,15 @@ module Todidnt
     def pretty
       "#{pretty_time} (#{author}, #{filename}:#{line_number}): #{content}"
     end
+
+    def to_hash
+      {
+        :time => pretty_time,
+        :author => author,
+        :filename => filename,
+        :line_number => line_number,
+        :content => content
+      }
+    end
   end
 end

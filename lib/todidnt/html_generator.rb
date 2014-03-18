@@ -1,6 +1,7 @@
 require 'tilt'
 require 'erb'
 require 'fileutils'
+require 'json'
 
 module Todidnt
   class HTMLGenerator

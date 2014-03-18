@@ -10,22 +10,59 @@
   </div>
 </div>
 
-<% for line in all_lines %>
-  <div class='line'>
-    <div class='meta'>
-      <div class='padding'>
-        <span class='date'><%= line.pretty_time %></span>
-        <span class='author'><%= line.author %></span>
-        <span class='file'><a href='<%= line.filename %>'><%= line.filename %>:<%= line.line_number %></a></span>
-      </div>
-    </div>
-    <div class='content'>
-      <div class='padding'>
-        <span><%= ERB::Util.html_escape(line.content) %></span>
-      </div>
-    </div>
-  </div>
-<% end %>
+<div id="all">
+</div>
+
+<script type="text/jsx">
+  /** @jsx React.DOM */
+
+  var lines = <%= all_lines.map(&:to_hash).to_json %>;
+
+  var TODOLineList = React.createClass({
+    render: function() {
+      var lines = [];
+      this.props.lines.forEach(function(line) {
+        lines.push(<TODOLine line={line} />);
+      });
+
+      return (
+        <div className='lines'>
+          {lines}
+        </div>
+      );
+    }
+  });
+
+  var TODOLine = React.createClass({
+    render: function() {
+      console.log(this);
+      return (
+        <div className='line'>
+          <div className='meta'>
+            <div className='padding'>
+              <span className='date'>{this.props.line.time}</span>
+              <span className='author'>{this.props.line.author}</span>
+              <span className='file'>
+                <a href={'../' + this.props.line.filename}>
+                  {this.props.line.filename}:{this.props.line.line_number}
+                </a>
+              </span>
+            </div>
+          </div>
+          <div className='content'>
+            <div className='padding'>
+              <span>{this.props.line.content}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  $(document).ready(function() {
+    React.renderComponent(<TODOLineList lines={lines} />, document.getElementById('all'));
+  });
+</script>
 
 <script type='text/javascript'>
   $(document).ready(function() {
