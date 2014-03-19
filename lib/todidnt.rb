@@ -70,7 +70,7 @@ module Todidnt
       GitRepo.new(options[:path]).run do |path|
         log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
 
-        history_by_author = {}
+        history = []
 
         puts "Going through log..."
         patch_additions = ''
@@ -82,9 +82,9 @@ module Todidnt
             email = summary[2]
             time = summary[3]
 
-            history_by_author[email] ||= []
-            history_by_author[email] << {
+            history << {
               :timestamp => time.to_i,
+              :author => name,
               :additions => patch_additions.scan('TODO').count,
               :deletions => patch_deletions.scan('TODO').count
             }
@@ -98,64 +98,54 @@ module Todidnt
           end
         end
 
-        min_commit_date = Time.at(history_by_author.map {|author, history| history}.first.map {|d| d[:timestamp]}.min)
+        history.sort_by! {|slice| slice[:timestamp]}
+        min_commit_date = Time.at(history.first[:timestamp])
 
-        interval = 86400
+        interval = 86400 * 7
         original_interval_start = Time.new(min_commit_date.year, min_commit_date.month, min_commit_date.day).to_i
         interval_start = original_interval_start
         interval_end = interval_start + interval
 
         puts "Finalizing timeline..."
-        history_by_author.each do |author, history|
-          buckets = []
-          current_total = 0
-          interval_start = original_interval_start
-          interval_end = interval_start + interval
+        buckets = []
+        current_bucket_authors = {}
 
-          i = 0
-          history = history.sort_by {|slice| slice[:timestamp]}
-          while i < history.length
-            should_increment = false
-            slice = history[i]
+        i = 0
+        # Going through the entire history of +/-'s of TODOs.
+        while i < history.length
+          should_increment = false
+          slice = history[i]
+          author = slice[:author]
 
-            # Does the current slice exist inside the bucket we're currently
-            # in? If so, add it to the total, and go to the next slice.
-            if slice[:timestamp] >= interval_start && slice[:timestamp] < interval_end
-              current_total += (slice[:additions] - slice[:deletions])
-              should_increment = true
-            end
-
-            # If we're on the last slice, or the next slice would have been
-            # in a new bucket, finish the current bucket.
-            if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
-              buckets << {
-                :timestamp => interval_start,
-                :total => current_total
-              }
-              interval_start += interval
-              interval_end += interval
-            end
-
-            i += 1 if should_increment
+          # Does the current slice exist inside the bucket we're currently
+          # in? If so, add it to the author's total and go to the next slice.
+          if slice[:timestamp] >= interval_start && slice[:timestamp] < interval_end
+            current_bucket_authors[author] ||= 0
+            current_bucket_authors[author] += slice[:additions] # TODO add deletions back later. - slice[:deletions])
+            should_increment = true
           end
 
-          history_by_author[author] = buckets
-        end
+          # If we're on the last slice, or the next slice would have been
+          # in a new bucket, finish the current bucket.
+          if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
+            buckets << {
+              :timestamp => Time.at(interval_start),
+              :authors => current_bucket_authors
+            }
+            interval_start += interval
+            interval_end += interval
 
-        history_by_author.each do |author, history|
-          puts "For #{author}:"
-
-          history.each do |slice|
-            print "#{Time.at(slice[:timestamp])} |"
-            print "*"*([0, slice[:total]].max / 10)
-            print " (#{slice[:total]})"
-            print "\n"
+            current_bucket_authors = current_bucket_authors.clone
           end
+
+          i += 1 if should_increment
         end
+
+        puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.inspect
+
+        file_path = HTMLGenerator.generate(:history, :history => buckets)
+        Launchy.open("file://#{file_path}")
       end
-
-      file_path = HTMLGenerator.generate(:history)
-      Launchy.open("file://#{file_path}")
     end
   end
 end

@@ -29,29 +29,7 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  var data = [
-    {
-      'Amber': 2,
-      'Carl' : 3,
-      'Date' : 1
-    },
-    {
-      'Amber': 5,
-      'Carl' : 2,
-      'Date' : 2
-    },
-    {
-      'Amber': 8,
-      'Carl' : 4,
-      'Date' : 3
-    },
-    {
-      'Amber': 8,
-      'Carl' : 4,
-      'Date' : 4
-    }
-  ];
-
+    var data = <%= history.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.to_json %>;
 
   color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Date"; }));
 
