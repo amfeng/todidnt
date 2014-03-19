@@ -13,11 +13,11 @@
     },
 
     handleFilterChange: function(name, value) {
-      newFilters = this.state.filters
+      newFilters = this.state.filters;
       if (value === '') {
-        delete newFilters[name]
+        delete newFilters[name];
       } else {
-        newFilters[name] = value
+        newFilters[name] = value;
       }
 
       this.setState({
@@ -58,7 +58,7 @@
 
   var TODOSelectFilter = React.createClass({
     selectElement: function() {
-      return this.refs[this.props.name + 'Select']
+      return this.refs[this.props.name + 'Select'];
     },
 
     handleSelect: function() {
@@ -67,12 +67,12 @@
     },
 
     componentDidMount: function() {
-      el = $(this.selectElement().getDOMNode())
+      el = $(this.selectElement().getDOMNode());
       el.chosen().change(this.handleSelect);
     },
 
     render: function() {
-      selectOptions = []
+      selectOptions = [];
       this.props.options.forEach(function(option) {
         selectOptions.push(<option>{option}</option>);
       });
@@ -94,7 +94,7 @@
     },
 
     includeLine: function(line) {
-      filters = this.props.filters
+      filters = this.props.filters;
 
       if (this.noFilters()) {
         return true;
