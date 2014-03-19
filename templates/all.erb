@@ -85,10 +85,14 @@
   });
 
   var TODOLineList = React.createClass({
+    noFilters: function() {
+      return _.isEmpty(this.props.filters);
+    },
+
     includeLine: function(line) {
       filters = this.props.filters
 
-      if (_.isEmpty(filters)) {
+      if (this.noFilters()) {
         return true;
       }
 
@@ -106,8 +110,16 @@
         }
       }.bind(this));
 
+      var countMessage = "";
+      if (this.noFilters()) {
+        countMessage = 'There are ' + lines.length + ' TODOs total!';
+      } else {
+        countMessage = 'There are ' + lines.length + ' TODOs, out of ' + this.props.lines.length + ' total!';
+      }
+
       return (
         <div className='lines'>
+          {countMessage}
           {lines}
         </div>
       );
