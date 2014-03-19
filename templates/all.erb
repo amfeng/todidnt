@@ -73,10 +73,12 @@
       });
 
       return (
-        <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'} onChange={this.handleSelect}>
-          <option selected>(none)</option>
-          {selectOptions}
-        </select>
+        <div className='filter'>
+          <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'} onChange={this.handleSelect}>
+            <option selected>(All authors)</option>
+            {selectOptions}
+          </select>
+        </div>
       );
     }
   });

@@ -52,6 +52,11 @@ section div.controls {
   padding-bottom: 20px;
 }
 
+section div.controls div.filter {
+  display: inline-block;
+  padding-left: 10px;
+}
+
 section div.controls div.filter select {
   width: 150px;
 }
