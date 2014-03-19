@@ -6,11 +6,26 @@
   var lines = <%= all_lines.map(&:to_hash).to_json %>;
 
   var FilterableTODOList = React.createClass({
+    getInitialState: function() {
+      return {
+        filters: {}
+      };
+    },
+
+    handleFilterChange: function(name, value) {
+      newFilters = this.state.filters
+      newFilters[name] = value
+
+      this.setState({
+        filters: newFilters
+      });
+    },
+
     render: function() {
       return (
         <div className='filterable-todo-list'>
-          <TODOFilters lines={this.props.lines} />
-          <TODOLineList lines={this.props.lines} />
+          <TODOFilters lines={this.props.lines} filters={this.state.filters} handleFilterChange={this.handleFilterChange} />
+          <TODOLineList lines={this.props.lines} filters={this.state.filters} />
         </div>
       );
     }
@@ -24,7 +39,7 @@
     },
 
     render: function() {
-      var authorFilter = <TODOSelectFilter field='author' options={this.authors()} />;
+      var authorFilter = <TODOSelectFilter name='author' options={this.authors()} handleFilterChange={this.props.handleFilterChange} />;
 
       return (
         <div className='controls'>
@@ -38,6 +53,11 @@
   });
 
   var TODOSelectFilter = React.createClass({
+    handleSelect: function() {
+      value = this.refs[this.props.name + 'Select'].getDOMNode().value;
+      this.props.handleFilterChange(this.props.name, value);
+    },
+
     render: function() {
       selectOptions = []
       this.props.options.forEach(function(option) {
@@ -45,7 +65,8 @@
       });
 
       return (
-        <select data-placeholder={this.props.field} id={this.props.field}>
+        <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'} onChange={this.handleSelect}>
+          <option selected>(none)</option>
           {selectOptions}
         </select>
       );
@@ -53,11 +74,27 @@
   });
 
   var TODOLineList = React.createClass({
+    includeLine: function(line) {
+      filters = this.props.filters
+
+      if (_.isEmpty(filters)) {
+        return true;
+      }
+
+      // If there are any filters, make sure the line fits all of them.
+      return _.every(Object.keys(filters), function(filter) {
+        return line[filter] === filters[filter];
+      });
+    },
+
     render: function() {
+      console.log("Rerendering!");
       var lines = [];
       this.props.lines.forEach(function(line) {
-        lines.push(<TODOLine line={line} />);
-      });
+        if (this.includeLine(line)) {
+          lines.push(<TODOLine line={line} />);
+        }
+      }.bind(this));
 
       return (
         <div className='lines'>
