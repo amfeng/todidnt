@@ -53,9 +53,17 @@
   });
 
   var TODOSelectFilter = React.createClass({
+    selectElement: function() {
+      return this.refs[this.props.name + 'Select']
+    },
+
     handleSelect: function() {
-      value = this.refs[this.props.name + 'Select'].getDOMNode().value;
+      value = this.selectElement().getDOMNode().value;
       this.props.handleFilterChange(this.props.name, value);
+    },
+
+    componentDidMount: function() {
+      $(this.selectElement().getDOMNode()).chosen();
     },
 
     render: function() {
@@ -88,7 +96,6 @@
     },
 
     render: function() {
-      console.log("Rerendering!");
       var lines = [];
       this.props.lines.forEach(function(line) {
         if (this.includeLine(line)) {
@@ -133,24 +140,3 @@
     React.renderComponent(<FilterableTODOList lines={lines} />, document.getElementById('all'));
   });
 </script>
-
-<script type='text/javascript'>
-  $(document).ready(function() {
-    $('select#author').chosen();
-
-    $('select#author').change(function() {
-      selectedValue = $(this).val();
-      $('div.line').each(function(i, line) {
-        lineElement = $(line);
-        var author = lineElement.find($('span.author')).text();
-
-        if (author === selectedValue) {
-          lineElement.show();
-        } else {
-          lineElement.hide();
-        }
-      });
-    });
-  });
-</script>
-
