@@ -63,7 +63,8 @@
     },
 
     componentDidMount: function() {
-      $(this.selectElement().getDOMNode()).chosen();
+      el = $(this.selectElement().getDOMNode())
+      el.chosen().change(this.handleSelect);
     },
 
     render: function() {
@@ -74,7 +75,7 @@
 
       return (
         <div className='filter'>
-          <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'} onChange={this.handleSelect}>
+          <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'}>
             <option selected>(All authors)</option>
             {selectOptions}
           </select>
