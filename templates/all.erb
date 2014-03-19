@@ -14,7 +14,11 @@
 
     handleFilterChange: function(name, value) {
       newFilters = this.state.filters
-      newFilters[name] = value
+      if (value === '') {
+        delete newFilters[name]
+      } else {
+        newFilters[name] = value
+      }
 
       this.setState({
         filters: newFilters
@@ -76,7 +80,7 @@
       return (
         <div className='filter'>
           <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'}>
-            <option selected>(All authors)</option>
+            <option value='' selected>(All authors)</option>
             {selectOptions}
           </select>
         </div>
