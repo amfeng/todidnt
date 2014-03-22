@@ -72,9 +72,11 @@ module Todidnt
 
         history = []
 
+        blame_hash = {}
+
         puts "Going through log..."
-        patch_additions = ''
-        patch_deletions = ''
+        patch_additions = []
+        patch_deletions = []
         total = log.output_lines.count
         log.output_lines.reverse.each do |line|
           if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
@@ -82,18 +84,49 @@ module Todidnt
             email = summary[2]
             time = summary[3]
 
+            # Put the additions in the blame hash so when someone removes we
+            # can tell who the original author was. Mrrrh, this isn't going to
+            # work if people add the same string (pretty common e.g. # TODO).
+            # We can figure this out later though.
+            patch_additions.each do |line|
+              blame_hash[line] ||= []
+              blame_hash[line] << name
+            end
+
+            deletions_by_author = {}
+            patch_deletions.each do |line|
+              author = blame_hash[line] && blame_hash[line].pop
+
+              if author
+                deletions_by_author[author] ||= 0
+                deletions_by_author[author] += 1
+              else
+                puts "BAD BAD can't find original author for that line! #{line}"
+              end
+            end
+
             history << {
               :timestamp => time.to_i,
               :author => name,
-              :additions => patch_additions.scan('TODO').count,
-              :deletions => patch_deletions.scan('TODO').count
+              :additions => patch_additions.count,
+              :deletions => deletions_by_author[name] || 0
             }
 
-            patch_additions = ''
-            patch_deletions = ''
-          elsif (diff = /^\+(.*)/.match(line))
+            deletions_by_author.delete(name)
+            deletions_by_author.each do |author, deletion_count|
+              history << {
+                :timestamp => time.to_i,
+                :author => author,
+                :additions => 0,
+                :deletions => deletion_count
+              }
+            end
+
+            patch_additions = []
+            patch_deletions = []
+          elsif (diff = /^\+(.*TODO.*)/.match(line))
             patch_additions << diff[1]
-          elsif (diff = /^\-(.*)/.match(line))
+          elsif (diff = /^\-(.*TODO.*)/.match(line))
             patch_deletions << diff[1]
           end
         end
@@ -126,7 +159,6 @@ module Todidnt
         puts "Finalizing timeline..."
         buckets = []
         current_bucket_authors = {}
-        deleted_lines = 0
 
         i = 0
         authors = Set.new
@@ -141,15 +173,7 @@ module Todidnt
           # in? If so, add it to the author's total and go to the next slice.
           if slice[:timestamp] >= interval_start && slice[:timestamp] < interval_end
             current_bucket_authors[author] ||= 0
-            current_bucket_authors[author] += (slice[:additions] - slice[:deletions])
-
-            # Don't let TODOs get into the negative. Instead, just add it to
-            # the "global" deleted lines.
-            if current_bucket_authors[author] < 0
-              deleted_lines -= current_bucket_authors[author]
-              current_bucket_authors[author] = 0
-            end
-
+            current_bucket_authors[author] += slice[:additions] - slice[:deletions]
             should_increment = true
           end
 
@@ -158,7 +182,6 @@ module Todidnt
           if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
             buckets << {
               :timestamp => Time.at(interval_start).strftime('%D'),
-              :deleted_lines => deleted_lines,
               :authors => current_bucket_authors
             }
             interval_start += interval
@@ -170,9 +193,9 @@ module Todidnt
           i += 1 if should_increment
         end
 
-        puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp], '_deleted_lines' => h[:deleted_lines]) }.inspect
+        puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.inspect
 
-        file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp], '_deleted_lines' => h[:deleted_lines]) }, :authors => authors.to_a})
+        file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
       end
     end
