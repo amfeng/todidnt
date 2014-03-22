@@ -159,21 +159,21 @@ module Todidnt
         puts "Finalizing timeline..."
         buckets = []
         current_bucket_authors = {}
+        bucket_total = 0
 
         i = 0
-        authors = Set.new
         # Going through the entire history of +/-'s of TODOs.
         while i < history.length
           should_increment = false
           slice = history[i]
           author = slice[:author]
-          authors << author
 
           # Does the current slice exist inside the bucket we're currently
           # in? If so, add it to the author's total and go to the next slice.
           if slice[:timestamp] >= interval_start && slice[:timestamp] < interval_end
             current_bucket_authors[author] ||= 0
             current_bucket_authors[author] += slice[:additions] - slice[:deletions]
+            bucket_total += slice[:additions] - slice[:deletions]
             should_increment = true
           end
 
@@ -182,7 +182,8 @@ module Todidnt
           if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
             buckets << {
               :timestamp => Time.at(interval_start).strftime('%D'),
-              :authors => current_bucket_authors
+              :authors => current_bucket_authors,
+              :total => bucket_total
             }
             interval_start += interval
             interval_end += interval
@@ -194,6 +195,34 @@ module Todidnt
         end
 
         puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.inspect
+
+        authors = Set.new
+        contains_other = false
+        buckets.each do |bucket|
+          significant_authors = {}
+          other_count = 0
+          bucket[:authors].each do |author, count|
+            # Only include the author if they account for more than > 3% of
+            # the TODOs in this bucket.
+            if count > bucket[:total] * 0.03
+              significant_authors[author] = count
+              authors << author
+            else
+              other_count += count
+            end
+          end
+
+          if other_count > 0
+            significant_authors['Other'] = other_count
+            contains_other = true
+          end
+
+          bucket[:authors] = significant_authors
+        end
+
+        if contains_other
+          authors << 'Other'
+        end
 
         file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
