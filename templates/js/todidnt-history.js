@@ -34,11 +34,10 @@ color.domain(authors);
 data.forEach(function(d) {
   var y0 = 0;
   d.ages = color.domain().map(function(name) {
-    console.log(d);
     return {
       name: name,
       y0: y0,
-      y1: y0 += +d[name]
+      y1: y0 += +(d[name] || 0)
     };
   });
   d.total = d.ages[d.ages.length - 1].y1;
@@ -83,14 +82,14 @@ var legend = svg.selectAll(".legend")
   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
 legend.append("rect")
-  .attr("x", width - 18)
+  .attr("x", 30)
   .attr("width", 18)
   .attr("height", 18)
   .style("fill", color);
 
 legend.append("text")
-  .attr("x", width - 24)
+  .attr("x", 55)
   .attr("y", 9)
   .attr("dy", ".35em")
-  .style("text-anchor", "end")
+  .style("text-anchor", "beginning")
   .text(function(d) { return d; });
