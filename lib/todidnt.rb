@@ -128,11 +128,13 @@ module Todidnt
         current_bucket_authors = {}
 
         i = 0
+        authors = Set.new
         # Going through the entire history of +/-'s of TODOs.
         while i < history.length
           should_increment = false
           slice = history[i]
           author = slice[:author]
+          authors << author
 
           # Does the current slice exist inside the bucket we're currently
           # in? If so, add it to the author's total and go to the next slice.
@@ -146,7 +148,7 @@ module Todidnt
           # in a new bucket, finish the current bucket.
           if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
             buckets << {
-              :timestamp => Time.at(interval_start),
+              :timestamp => Time.at(interval_start).strftime('%D'),
               :authors => current_bucket_authors
             }
             interval_start += interval
@@ -160,7 +162,7 @@ module Todidnt
 
         puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.inspect
 
-        file_path = HTMLGenerator.generate(:history, :history => buckets)
+        file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
       end
     end
