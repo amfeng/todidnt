@@ -1,6 +1,6 @@
 module Todidnt
   class TodoLine
-    IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary}
+    IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary|vendor}
 
     attr_reader :filename, :line_number, :content, :author, :timestamp
 
