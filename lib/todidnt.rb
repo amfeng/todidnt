@@ -100,8 +100,25 @@ module Todidnt
 
         history.sort_by! {|slice| slice[:timestamp]}
         min_commit_date = Time.at(history.first[:timestamp])
+        max_commit_date = Time.at(history.last[:timestamp])
 
-        interval = 86400 * 7
+        timespan = max_commit_date - min_commit_date
+
+        # Figure out what the interval should be based on the total timespan.
+        if timespan > 86400 * 365 * 10 # 10+ years
+          interval = 86400 * 365 # years
+        elsif timespan > 86400 * 365 * 5 # 5-10 years
+          interval = 86400 * (365 / 2) # 6 months
+        elsif timespan > 86400 * 365 # 2-5 years
+          interval = 86400 * (365 / 4) # 3 months
+        elsif timespan > 86400 * 30 * 6 # 6 months-3 year
+          interval = 86400 * 30 # months
+        elsif timespan > 86400 * 1 # 1 month - 6 months
+          interval = 86400 * 7
+        else # 0 - 2 months
+          interval = 86400 # days
+        end
+
         original_interval_start = Time.new(min_commit_date.year, min_commit_date.month, min_commit_date.day).to_i
         interval_start = original_interval_start
         interval_end = interval_start + interval
