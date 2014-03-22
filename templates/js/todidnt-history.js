@@ -1,6 +1,6 @@
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-  width = 960 - margin.left - margin.right,
-  height = 500 - margin.top - margin.bottom;
+var margin = {top: 20, right: 20, bottom: 30, left: Math.round(window.innerWidth * 0.09)},
+  width = window.innerWidth  * 0.8,
+  height = 500;
 
 var x = d3.scale.ordinal()
   .rangeRoundBands([0, width], .1);
@@ -20,8 +20,8 @@ var yAxis = d3.svg.axis()
     .orient("left")
     .tickFormat(d3.format(".2s"));
 
-var svg = d3.select("body").append("svg")
-  .attr("width", width + margin.left + margin.right)
+var svg = d3.select("section.content").append("svg")
+  .attr("width", '100%')
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
