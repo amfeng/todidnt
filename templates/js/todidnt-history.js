@@ -34,11 +34,16 @@ color.domain(authors);
 data.forEach(function(d) {
   var y0 = 0;
   d.ages = color.domain().map(function(name) {
-    return {
+    console.log(d);
+    datum = {
       name: name,
-    y0: y0,
-    y1: y0 += +d[name]
+      y0: y0 - d['_deleted_lines'],
+      y1: y0 + +d[name] - d['_deleted_lines']
     };
+
+    y0 += +d[name];
+
+    return datum;
   });
   d.total = d.ages[d.ages.length - 1].y1;
 });
