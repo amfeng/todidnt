@@ -8,8 +8,15 @@ var x = d3.scale.ordinal()
 var y = d3.scale.linear()
   .rangeRound([height, 0]);
 
-var color = d3.scale.ordinal()
-  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+var color = d3.scale.category20b();
+
+var getColor = function(name) {
+  if (name === 'Other') {
+    return "#ccc"; // gray
+  } else {
+    return color(name);
+  }
+};
 
 var xAxis = d3.svg.axis()
   .scale(x)
@@ -73,7 +80,7 @@ state.selectAll("rect")
   .attr("width", x.rangeBand())
   .attr("y", function(d) { return y(d.y1); })
   .attr("height", function(d) { return y(d.y0) - y(d.y1); })
-  .style("fill", function(d) { return color(d.name); });
+  .style("fill", function(d) { return getColor(d.name); });
 
 var legend = svg.selectAll(".legend")
   .data(color.domain().slice().reverse())
@@ -85,7 +92,7 @@ legend.append("rect")
   .attr("x", 30)
   .attr("width", 18)
   .attr("height", 18)
-  .style("fill", color);
+  .style("fill", getColor);
 
 legend.append("text")
   .attr("x", 55)
