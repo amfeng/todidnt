@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'todidnt'
-  s.version     = '0.1.0'
+  s.version     = '0.2.0'
   s.summary     = 'Todidnt'
   s.description = "Todidnt finds and dates todos in your git repository."
   s.authors     = ["Amber Feng"]
@@ -12,5 +12,5 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- test/test_*.rb`.split("\n")
   s.executables   = ['todidnt']
-  s.require_paths = %w[lib]
+  s.require_paths = ['lib']
 end

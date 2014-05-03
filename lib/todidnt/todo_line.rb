@@ -1,6 +1,6 @@
 module Todidnt
   class TodoLine
-    IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary}
+    IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary|vendor}
 
     attr_reader :filename, :line_number, :content, :author, :timestamp
 
@@ -28,6 +28,7 @@ module Todidnt
       options = [
         ['--line-porcelain'],
         ['-L', "#{@line_number},#{@line_number}"],
+        ['-w'],
         [@filename]
       ]
 
@@ -47,6 +48,16 @@ module Todidnt
 
     def pretty
       "#{pretty_time} (#{author}, #{filename}:#{line_number}): #{content}"
+    end
+
+    def to_hash
+      {
+        :time => pretty_time,
+        :author => author,
+        :filename => filename,
+        :line_number => line_number,
+        :content => content
+      }
     end
   end
 end

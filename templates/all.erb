@@ -1,0 +1,161 @@
+<div id='all'></div>
+
+<script type="text/jsx">
+  /** @jsx React.DOM */
+
+  var lines = <%= all_lines.map(&:to_hash).to_json %>;
+
+  var FilterableTODOList = React.createClass({
+    getInitialState: function() {
+      return {
+        filters: {}
+      };
+    },
+
+    handleFilterChange: function(name, value) {
+      newFilters = this.state.filters;
+      if (value === '') {
+        delete newFilters[name];
+      } else {
+        newFilters[name] = value;
+      }
+
+      this.setState({
+        filters: newFilters
+      });
+    },
+
+    render: function() {
+      return (
+        <div className='filterable-todo-list'>
+          <TODOFilters lines={this.props.lines} filters={this.state.filters} handleFilterChange={this.handleFilterChange} />
+          <TODOLineList lines={this.props.lines} filters={this.state.filters} />
+        </div>
+      );
+    }
+  });
+
+  var TODOFilters = React.createClass({
+    authors: function() {
+      return _.uniq(
+        _.map(this.props.lines, function(line) { return line.author; })
+      );
+    },
+
+    render: function() {
+      var authorFilter = <TODOSelectFilter name='author' options={this.authors()} handleFilterChange={this.props.handleFilterChange} />;
+
+      return (
+        <div className='controls'>
+          <div className='filters'>
+            Filter by:
+            {authorFilter}
+          </div>
+        </div>
+      );
+    }
+  });
+
+  var TODOSelectFilter = React.createClass({
+    selectElement: function() {
+      return this.refs[this.props.name + 'Select'];
+    },
+
+    handleSelect: function() {
+      value = this.selectElement().getDOMNode().value;
+      this.props.handleFilterChange(this.props.name, value);
+    },
+
+    componentDidMount: function() {
+      el = $(this.selectElement().getDOMNode());
+      el.chosen().change(this.handleSelect);
+    },
+
+    render: function() {
+      selectOptions = [];
+      this.props.options.forEach(function(option) {
+        selectOptions.push(<option>{option}</option>);
+      });
+
+      return (
+        <div className='filter'>
+          <select data-placeholder={this.props.name} id={this.props.name} ref={this.props.name + 'Select'}>
+            <option value='' selected>(All authors)</option>
+            {selectOptions}
+          </select>
+        </div>
+      );
+    }
+  });
+
+  var TODOLineList = React.createClass({
+    noFilters: function() {
+      return _.isEmpty(this.props.filters);
+    },
+
+    includeLine: function(line) {
+      filters = this.props.filters;
+
+      if (this.noFilters()) {
+        return true;
+      }
+
+      // If there are any filters, make sure the line fits all of them.
+      return _.every(Object.keys(filters), function(filter) {
+        return line[filter] === filters[filter];
+      });
+    },
+
+    render: function() {
+      var lines = [];
+      this.props.lines.forEach(function(line) {
+        if (this.includeLine(line)) {
+          lines.push(<TODOLine line={line} />);
+        }
+      }.bind(this));
+
+      var countMessage = "";
+      if (this.noFilters()) {
+        countMessage = 'There are ' + lines.length + ' TODOs total!';
+      } else {
+        countMessage = 'There are ' + lines.length + ' TODOs, out of ' + this.props.lines.length + ' total!';
+      }
+
+      return (
+        <div className='lines'>
+          {countMessage}
+          {lines}
+        </div>
+      );
+    }
+  });
+
+  var TODOLine = React.createClass({
+    render: function() {
+      return (
+        <div className='line'>
+          <div className='meta'>
+            <div className='padding'>
+              <span className='date'>{this.props.line.time}</span>
+              <span className='author'>{this.props.line.author}</span>
+              <span className='file'>
+                <a href={'../' + this.props.line.filename}>
+                  {this.props.line.filename}:{this.props.line.line_number}
+                </a>
+              </span>
+            </div>
+          </div>
+          <div className='content'>
+            <div className='padding'>
+              <span>{this.props.line.content}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  });
+
+  $(document).ready(function() {
+    React.renderComponent(<FilterableTODOList lines={lines} />, document.getElementById('all'));
+  });
+</script>
