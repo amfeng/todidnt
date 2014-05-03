@@ -104,7 +104,7 @@ module Todidnt
                   deletions_by_author[author] ||= 0
                   deletions_by_author[author] += 1
                 else
-                  puts "BAD BAD can't find original author for that line! #{line}"
+                  puts "BAD BAD can't find original author: #{line}"
                 end
               end
 
