@@ -77,53 +77,59 @@ module Todidnt
         puts "Going through log..."
         patch_additions = []
         patch_deletions = []
+        filename = nil
         total = log.output_lines.count
+
         log.output_lines.reverse.each do |line|
           if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
             name = summary[1]
             email = summary[2]
             time = summary[3]
 
-            # Put the additions in the blame hash so when someone removes we
-            # can tell who the original author was. Mrrrh, this isn't going to
-            # work if people add the same string (pretty common e.g. # TODO).
-            # We can figure this out later though.
-            patch_additions.each do |line|
-              blame_hash[line] ||= []
-              blame_hash[line] << name
-            end
-
-            deletions_by_author = {}
-            patch_deletions.each do |line|
-              author = blame_hash[line] && blame_hash[line].pop
-
-              if author
-                deletions_by_author[author] ||= 0
-                deletions_by_author[author] += 1
-              else
-                puts "BAD BAD can't find original author for that line! #{line}"
+            unless filename =~ TodoLine::IGNORE
+              # Put the additions in the blame hash so when someone removes we
+              # can tell who the original author was. Mrrrh, this isn't going to
+              # work if people add the same string (pretty common e.g. # TODO).
+              # We can figure this out later though.
+              patch_additions.each do |line|
+                blame_hash[line] ||= []
+                blame_hash[line] << name
               end
-            end
 
-            history << {
-              :timestamp => time.to_i,
-              :author => name,
-              :additions => patch_additions.count,
-              :deletions => deletions_by_author[name] || 0
-            }
+              deletions_by_author = {}
+              patch_deletions.each do |line|
+                author = blame_hash[line] && blame_hash[line].pop
 
-            deletions_by_author.delete(name)
-            deletions_by_author.each do |author, deletion_count|
+                if author
+                  deletions_by_author[author] ||= 0
+                  deletions_by_author[author] += 1
+                else
+                  puts "BAD BAD can't find original author for that line! #{line}"
+                end
+              end
+
               history << {
                 :timestamp => time.to_i,
-                :author => author,
-                :additions => 0,
-                :deletions => deletion_count
+                :author => name,
+                :additions => patch_additions.count,
+                :deletions => deletions_by_author[name] || 0
               }
+
+              deletions_by_author.delete(name)
+              deletions_by_author.each do |author, deletion_count|
+                history << {
+                  :timestamp => time.to_i,
+                  :author => author,
+                  :additions => 0,
+                  :deletions => deletion_count
+                }
+              end
             end
 
             patch_additions = []
             patch_deletions = []
+          elsif (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
+            filename = diff[1]
           elsif (diff = /^\+(.*TODO.*)/.match(line))
             patch_additions << diff[1]
           elsif (diff = /^\-(.*TODO.*)/.match(line))
@@ -193,8 +199,6 @@ module Todidnt
 
           i += 1 if should_increment
         end
-
-        puts buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }.inspect
 
         authors = Set.new
         contains_other = false
