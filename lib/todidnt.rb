@@ -68,7 +68,7 @@ module Todidnt
 
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0']])
+        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0'], ['--reverse']])
 
         history = []
 
@@ -80,8 +80,23 @@ module Todidnt
         filename = nil
         total = log.output_lines.count
 
-        log.output_lines.reverse.each do |line|
-          if (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
+        # Log entries of the format:
+        #
+        # diff --git a/<FILENAME> b/<FILENAME>
+        # index <COMMIT>..<COMMIT>
+        # --- a/<FILENAME>
+        # +++ b/<FILENAME>
+        # <DIFF>
+        # COMMIT <NAME> <EMAIL> <DATE>
+
+        log.execute! do |line|
+          if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
+            filename = diff[1]
+          elsif (diff = /^\+(.*TODO.*)/.match(line))
+            patch_additions << diff[1]
+          elsif (diff = /^\-(.*TODO.*)/.match(line))
+            patch_deletions << diff[1]
+          elsif (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
             name = summary[1]
             email = summary[2]
             time = summary[3]
@@ -128,12 +143,6 @@ module Todidnt
 
             patch_additions = []
             patch_deletions = []
-          elsif (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
-            filename = diff[1]
-          elsif (diff = /^\+(.*TODO.*)/.match(line))
-            patch_additions << diff[1]
-          elsif (diff = /^\-(.*TODO.*)/.match(line))
-            patch_deletions << diff[1]
           end
         end
 
