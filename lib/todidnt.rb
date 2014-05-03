@@ -78,7 +78,7 @@ module Todidnt
         patch_additions = []
         patch_deletions = []
         filename = nil
-        total = log.output_lines.count
+        count = 0
 
         # Log entries of the format:
         #
@@ -97,6 +97,9 @@ module Todidnt
           elsif (diff = /^\-(.*TODO.*)/.match(line))
             patch_deletions << diff[1]
           elsif (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
+            count += 1
+            $stdout.write "\r#{count} commits analyzed"
+
             name = summary[1]
             email = summary[2]
             time = summary[3]
@@ -119,7 +122,7 @@ module Todidnt
                   deletions_by_author[author] ||= 0
                   deletions_by_author[author] += 1
                 else
-                  puts "BAD BAD can't find original author: #{line}"
+                  #puts "BAD BAD can't find original author: #{line}"
                 end
               end
 
@@ -171,7 +174,7 @@ module Todidnt
         interval_start = original_interval_start
         interval_end = interval_start + interval
 
-        puts "Finalizing timeline..."
+        puts "\nFinalizing timeline..."
         buckets = []
         current_bucket_authors = {}
         bucket_total = 0
