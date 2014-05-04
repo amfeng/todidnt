@@ -24,6 +24,7 @@ module Todidnt
       patch_additions = []
       patch_deletions = []
       metadata = nil
+      filename = nil
       commit = nil
       seen_commits = Set.new
       count = 0
@@ -32,14 +33,14 @@ module Todidnt
         if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
           filename = diff[1]
         elsif (diff = /^\+(.*TODO.*)/.match(line))
-          patch_additions << diff[1]
+          patch_additions << diff[1] unless filename =~ TodoLine::IGNORE
         elsif (diff = /^\-(.*TODO.*)/.match(line))
-          patch_deletions << diff[1]
+          patch_deletions << diff[1] unless filename =~ TodoLine::IGNORE
         elsif (summary = /^COMMIT (.*) (.*) (.*) (.*)/.match(line))
           count += 1
           $stdout.write "\r#{count} commits analyzed..."
 
-          unless commit.nil? || seen_commits.include?(commit) || filename =~ TodoLine::IGNORE
+          unless commit.nil? || seen_commits.include?(commit)
             flush(metadata, patch_additions, patch_deletions)
             seen_commits << commit
           end
