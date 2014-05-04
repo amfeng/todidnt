@@ -1,12 +1,14 @@
 module Todidnt
   class GitHistory
 
+    attr_accessor :blames
+
     def initialize
       @history = []
       @blames = {}
       @unmatched_deletions = []
 
-      @command = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-p'], ['-w'], ['-U0'], ['--no-merges'], ['--reverse']])
+      @command = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-p'], ['-U0'], ['--no-merges'], ['--reverse']])
     end
 
     def timeline!
@@ -29,9 +31,9 @@ module Todidnt
       @command.execute! do |line|
         if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
           filename = diff[1]
-        elsif (diff = /^\w*\++(.*TODO.*)/.match(line))
+        elsif (diff = /^\+(.*TODO.*)/.match(line))
           patch_additions << diff[1]
-        elsif (diff = /^\w*\-+(.*TODO.*)/.match(line))
+        elsif (diff = /^\-(.*TODO.*)/.match(line))
           patch_deletions << diff[1]
         elsif (summary = /^COMMIT (.*) (.*) (.*) (.*)/.match(line))
           count += 1
@@ -71,12 +73,12 @@ module Todidnt
       # We can figure this out later thoug.
       patch_additions.each do |line|
         @blames[line] ||= []
-        @blames[line] << name
+        @blames[line] << {name: name, time: time}
       end
 
       deletions_by_author = {}
       patch_deletions.each do |line|
-        author = @blames[line] && @blames[line].pop
+        author = @blames[line] && @blames[line].pop[:name]
 
         if author
           deletions_by_author[author] ||= 0

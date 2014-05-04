@@ -2,7 +2,8 @@ module Todidnt
   class TodoLine
     IGNORE = %r{assets/js|third_?party|node_modules|jquery|Binary|vendor}
 
-    attr_reader :filename, :line_number, :content, :author, :timestamp
+    attr_reader :filename, :line_number, :raw_content
+    attr_accessor :author, :timestamp
 
     def self.all(expressions)
       options = [['-n']]
@@ -12,15 +13,15 @@ module Todidnt
       grep.output_lines.map do |line|
         filename, line_number, content = line.split(/:/, 3)
         unless filename =~ IGNORE
-          lines = self.new(filename, line_number.to_i, content.strip[0..100])
+          lines = self.new(filename, line_number.to_i, content)
         end
       end.compact
     end
 
-    def initialize(filename, line_number, content)
+    def initialize(filename, line_number, raw_content)
       @filename = filename
       @line_number = line_number
-      @content = content
+      @raw_content = raw_content
     end
 
     # TODO: This logic should probably be moved out somewhere else
@@ -48,6 +49,10 @@ module Todidnt
 
     def pretty
       "#{pretty_time} (#{author}, #{filename}:#{line_number}): #{content}"
+    end
+
+    def content
+      raw_content.strip[0..100]
     end
 
     def to_hash

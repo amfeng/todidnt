@@ -69,7 +69,24 @@ module Todidnt
 
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        buckets, authors = GitHistory.new.timeline!
+        history = GitHistory.new
+        buckets, authors = history.timeline!
+
+        lines = TodoLine.all(["TODO"])
+        lines.each do |todo|
+          blames = history.blames[todo.raw_content]
+
+          if blames && (metadata = blames.pop)
+            todo.author = metadata[:name]
+            todo.timestamp = metadata[:time]
+          else
+            todo.author = "(Not yet committed)"
+            todo.timestamp = Time.now.to_i
+          end
+        end
+
+        file_path = HTMLGenerator.generate(:all, :all_lines => lines)
+        Launchy.open("file://#{file_path}")
 
         file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
