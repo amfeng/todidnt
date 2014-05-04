@@ -40,7 +40,7 @@ module Todidnt
           end
         end
 
-        file_path = HTMLGenerator.generate(:all, :all_lines => lines)
+        file_path = HTMLGenerator.generate(:all, :all_lines => lines.sort_by(&:timestamp).reverse)
         file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
       end
