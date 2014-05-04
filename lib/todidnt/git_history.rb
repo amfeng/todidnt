@@ -78,11 +78,11 @@ module Todidnt
 
       deletions_by_author = {}
       patch_deletions.each do |line|
-        author = @blames[line] && @blames[line].pop[:name]
+        author = @blames[line] && @blames[line].pop
 
         if author
-          deletions_by_author[author] ||= 0
-          deletions_by_author[author] += 1
+          deletions_by_author[author[:name]] ||= 0
+          deletions_by_author[author[:name]] += 1
         else
           @unmatched_deletions << line
         end
