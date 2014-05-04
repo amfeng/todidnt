@@ -68,7 +68,7 @@ module Todidnt
 
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at"'], ['-p'], ['-U0'], ['--reverse']])
+        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-m'], ['-p'], ['--cc'], ['-U0'], ['--reverse']])
 
         history = []
 
@@ -78,6 +78,7 @@ module Todidnt
         patch_additions = []
         patch_deletions = []
         filename = nil
+        seen_commits = Set.new
         count = 0
 
         # Log entries of the format:
@@ -92,23 +93,24 @@ module Todidnt
         log.execute! do |line|
           if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
             filename = diff[1]
-          elsif (diff = /^\+(.*TODO.*)/.match(line))
+          elsif (diff = /^\w*\++(.*TODO.*)/.match(line))
             patch_additions << diff[1]
-          elsif (diff = /^\-(.*TODO.*)/.match(line))
+          elsif (diff = /^\w*\-+(.*TODO.*)/.match(line))
             patch_deletions << diff[1]
-          elsif (summary = /^COMMIT (.*) (.*) (.*)/.match(line))
+          elsif (summary = /^COMMIT (.*) (.*) (.*) (.*)/.match(line))
             count += 1
             $stdout.write "\r#{count} commits analyzed"
 
             name = summary[1]
             email = summary[2]
             time = summary[3]
+            commit = summary[4]
 
-            unless filename =~ TodoLine::IGNORE
+            unless seen_commits.include?(commit) || filename =~ TodoLine::IGNORE
               # Put the additions in the blame hash so when someone removes we
               # can tell who the original author was. Mrrrh, this isn't going to
               # work if people add the same string (pretty common e.g. # TODO).
-              # We can figure this out later though.
+              # We can figure this out later thoug.
               patch_additions.each do |line|
                 blame_hash[line] ||= []
                 blame_hash[line] << name
@@ -122,7 +124,7 @@ module Todidnt
                   deletions_by_author[author] ||= 0
                   deletions_by_author[author] += 1
                 else
-                  #puts "BAD BAD can't find original author: #{line}"
+                  puts "BAD BAD can't find original author: #{line}"
                 end
               end
 
@@ -146,6 +148,8 @@ module Todidnt
 
             patch_additions = []
             patch_deletions = []
+
+            seen_commits << commit
           end
         end
 
