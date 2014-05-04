@@ -66,18 +66,61 @@ module Todidnt
       end
     end
 
+    def self.flush(metadata, patch_additions, patch_deletions)
+      name = metadata[:name]
+      time = metadata[:time]
+
+      # Put the additions in the blame hash so when someone removes we
+      # can tell who the original author was. Mrrrh, this isn't going to
+      # work if people add the same string (pretty common e.g. # TODO).
+      # We can figure this out later thoug.
+      patch_additions.each do |line|
+        @blame_hash[line] ||= []
+        @blame_hash[line] << name
+      end
+
+      deletions_by_author = {}
+      patch_deletions.each do |line|
+        author = @blame_hash[line] && @blame_hash[line].pop
+
+        if author
+          deletions_by_author[author] ||= 0
+          deletions_by_author[author] += 1
+        else
+          puts "BAD BAD can't find original author: #{line}"
+        end
+      end
+
+      @history << {
+        :timestamp => time,
+        :author => name,
+        :additions => patch_additions.count,
+        :deletions => deletions_by_author[name] || 0
+      }
+
+      deletions_by_author.delete(name)
+      deletions_by_author.each do |author, deletion_count|
+        @history << {
+          :timestamp => time,
+          :author => author,
+          :additions => 0,
+          :deletions => deletion_count
+        }
+      end
+    end
+
     def self.history(options)
       GitRepo.new(options[:path]).run do |path|
-        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-m'], ['-p'], ['--cc'], ['-U0'], ['--reverse']])
+        log = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-p'], ['-w'], ['-U0'], ['--no-merges'], ['--reverse']])
 
-        history = []
-
-        blame_hash = {}
+        @history = []
+        @blame_hash = {}
 
         puts "Going through log..."
         patch_additions = []
         patch_deletions = []
-        filename = nil
+        metadata = nil
+        commit = nil
         seen_commits = Set.new
         count = 0
 
@@ -101,61 +144,27 @@ module Todidnt
             count += 1
             $stdout.write "\r#{count} commits analyzed"
 
-            name = summary[1]
-            email = summary[2]
-            time = summary[3]
-            commit = summary[4]
-
-            unless seen_commits.include?(commit) || filename =~ TodoLine::IGNORE
-              # Put the additions in the blame hash so when someone removes we
-              # can tell who the original author was. Mrrrh, this isn't going to
-              # work if people add the same string (pretty common e.g. # TODO).
-              # We can figure this out later thoug.
-              patch_additions.each do |line|
-                blame_hash[line] ||= []
-                blame_hash[line] << name
-              end
-
-              deletions_by_author = {}
-              patch_deletions.each do |line|
-                author = blame_hash[line] && blame_hash[line].pop
-
-                if author
-                  deletions_by_author[author] ||= 0
-                  deletions_by_author[author] += 1
-                else
-                  puts "BAD BAD can't find original author: #{line}"
-                end
-              end
-
-              history << {
-                :timestamp => time.to_i,
-                :author => name,
-                :additions => patch_additions.count,
-                :deletions => deletions_by_author[name] || 0
-              }
-
-              deletions_by_author.delete(name)
-              deletions_by_author.each do |author, deletion_count|
-                history << {
-                  :timestamp => time.to_i,
-                  :author => author,
-                  :additions => 0,
-                  :deletions => deletion_count
-                }
-              end
+            unless commit.nil? || seen_commits.include?(commit) || filename =~ TodoLine::IGNORE
+              flush(metadata, patch_additions, patch_deletions)
+              seen_commits << commit
             end
 
             patch_additions = []
             patch_deletions = []
 
-            seen_commits << commit
+            commit = summary[4]
+            metadata = {
+              name: summary[1],
+              time: summary[3].to_i,
+            }
           end
         end
 
-        history.sort_by! {|slice| slice[:timestamp]}
-        min_commit_date = Time.at(history.first[:timestamp])
-        max_commit_date = Time.at(history.last[:timestamp])
+        flush(metadata, patch_additions, patch_deletions)
+
+        @history.sort_by! {|slice| slice[:timestamp]}
+        min_commit_date = Time.at(@history.first[:timestamp])
+        max_commit_date = Time.at(@history.last[:timestamp])
 
         timespan = max_commit_date - min_commit_date
 
@@ -185,9 +194,9 @@ module Todidnt
 
         i = 0
         # Going through the entire history of +/-'s of TODOs.
-        while i < history.length
+        while i < @history.length
           should_increment = false
-          slice = history[i]
+          slice = @history[i]
           author = slice[:author]
 
           # Does the current slice exist inside the bucket we're currently
@@ -201,7 +210,7 @@ module Todidnt
 
           # If we're on the last slice, or the next slice would have been
           # in a new bucket, finish the current bucket.
-          if i == (history.length - 1) || history[i + 1][:timestamp] >= interval_end
+          if i == (@history.length - 1) || @history[i + 1][:timestamp] >= interval_end
             buckets << {
               :timestamp => Time.at(interval_start).strftime('%D'),
               :authors => current_bucket_authors,
