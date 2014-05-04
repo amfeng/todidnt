@@ -1,3 +1,4 @@
+require 'todidnt/cache'
 require 'todidnt/git_repo'
 require 'todidnt/git_command'
 require 'todidnt/todo_line'
@@ -9,7 +10,7 @@ require 'launchy'
 
 module Todidnt
   class CLI
-    VALID_COMMANDS = %w{generate}
+    VALID_COMMANDS = %w{generate clear}
 
     def self.run(command, options)
       command ||= 'generate'
@@ -44,6 +45,10 @@ module Todidnt
         file_path = HTMLGenerator.generate(:history, :data => {:history => buckets.map {|h| h[:authors].merge('Date' => h[:timestamp]) }, :authors => authors.to_a})
         Launchy.open("file://#{file_path}")
       end
+    end
+
+    def self.clear(options)
+      Cache.clear!
     end
   end
 end

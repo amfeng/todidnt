@@ -12,7 +12,32 @@ module Todidnt
     end
 
     def timeline!
-      analyze
+      if Cache.exists?(:history)
+        puts "Found cached history..."
+
+        cache = Cache.load(:history)
+
+        @history = cache[:history]
+        @blames = cache[:blames]
+        @unmatched_deletions = cache[:unmatched_deletions]
+
+        # TODO: go through rest
+      else
+        analyze
+
+        to_cache = {
+          history: @history,
+          blames: @blames,
+          unmatched_deletions: @unmatched_deletions
+        }
+
+        Cache.save(:history, to_cache)
+      end
+
+      if @unmatched_deletions.length > 0
+        puts "Warning: there are some unmatched TODO deletions."
+      end
+
       bucket
     end
 
@@ -59,9 +84,6 @@ module Todidnt
       flush(metadata, patch_additions, patch_deletions)
 
       puts
-      if @unmatched_deletions.length > 0
-        puts "Warning: there are some unmatched TODO deletions."
-      end
     end
 
     def flush(metadata, patch_additions, patch_deletions)
