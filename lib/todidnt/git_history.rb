@@ -8,7 +8,6 @@ module Todidnt
       @blames = {}
       @unmatched_deletions = []
 
-      @command = GitCommand.new(:log, [['-G', 'TODO'], ['--format="COMMIT %an %ae %at %h"'], ['-p'], ['-U0'], ['--no-merges'], ['--reverse']])
     end
 
     def timeline!
@@ -17,15 +16,18 @@ module Todidnt
 
         cache = Cache.load(:history)
 
-        @history = cache[:history]
-        @blames = cache[:blames]
-        @unmatched_deletions = cache[:unmatched_deletions]
+        @history = cache.data[:history]
+        @blames = cache.data[:blames]
+        @unmatched_deletions = cache.data[:unmatched_deletions]
 
-        # TODO: go through rest
-      else
-        analyze
+        last_commit = cache.data[:last_commit]
+      end
 
+      new_commit = analyze(last_commit)
+      if new_commit != last_commit
+        # If there's any new history, update the cache.
         to_cache = {
+          last_commit: last_commit,
           history: @history,
           blames: @blames,
           unmatched_deletions: @unmatched_deletions
@@ -43,8 +45,15 @@ module Todidnt
 
     private
 
-    def analyze
-      puts "Going through history..."
+    def analyze(last_commit=nil)
+      if last_commit
+        puts "Going through history starting at #{last_commit}..."
+        commit_range = ["#{last_commit}...HEAD"]
+      else
+        puts "Going through history..."
+      end
+
+      command = GitCommand.new(:log, [['-G', 'TODO'], commit_range, ['--format="COMMIT %an %ae %at %h"'], ['-p'], ['-U0'], ['--no-merges'], ['--reverse']].compact)
 
       patch_additions = []
       patch_deletions = []
@@ -54,7 +63,7 @@ module Todidnt
       seen_commits = Set.new
       count = 0
 
-      @command.execute! do |line|
+      command.execute! do |line|
         if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
           filename = diff[1]
         elsif (diff = /^\+(.*TODO.*)/.match(line))
@@ -81,9 +90,12 @@ module Todidnt
         end
       end
 
-      flush(metadata, patch_additions, patch_deletions)
+      if commit
+        puts
+        flush(metadata, patch_additions, patch_deletions)
+      end
 
-      puts
+      return commit || last_commit # return the last commit hash we were on
     end
 
     def flush(metadata, patch_additions, patch_deletions)

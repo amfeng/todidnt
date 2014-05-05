@@ -48,7 +48,9 @@ module Todidnt
     end
 
     def self.clear(options)
+      puts "Deleting cache..."
       Cache.clear!
+      puts "Done!"
     end
   end
 end
