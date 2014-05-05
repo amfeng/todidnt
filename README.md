@@ -20,14 +20,12 @@ Then, run `todidnt` in any Git repository directory:
 TODO[1]
 ----
 
-- Optimizing blame step
 - Filtering by author, label
-- Fancy formatted reports
 - TODO stats
 
 Credit
 ----
 
-Paul Battley (@threedaymonk) for initial idea/implementation and witty name.
+Paul Battley (@threedaymonk) for initial idea and witty name.
 
 1: Oh, the irony.
