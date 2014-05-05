@@ -36,6 +36,11 @@ var yAxis = d3.svg.axis()
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) { return d.name + " - " + (d.y1 - d.y0); });
+
 // Transform data
 
 var authors = PRELOADED_DATA['authors'];
@@ -62,6 +67,8 @@ var svg = d3.select("section.content").append("svg")
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.call(tip);
 
 x.domain(data.map(function(d) { return d.date; }));
 y.domain([0, d3.max(data, function(d) { return d.total; })]);
@@ -93,7 +100,9 @@ dates.selectAll("rect")
   .attr("width", x.rangeBand())
   .attr("y", function(d) { return y(d.y1); })
   .attr("height", function(d) { return y(d.y0) - y(d.y1); })
-  .style("fill", function(d) { return getColor(d.name); });
+  .style("fill", function(d) { return getColor(d.name); })
+  .on("mouseover", tip.show)
+  .on("mouseout", tip.hide);
 
 // Legend
 

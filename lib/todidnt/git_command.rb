@@ -1,16 +1,18 @@
+require 'subprocess'
+
 module Todidnt
   class GitCommand
     def initialize(command, options)
       @command = command
       @options = options
+
+      @process = Subprocess::Process.new(command_with_options, :stdout => Subprocess::PIPE)
     end
 
-    def output_lines
-      run!.strip.split(/\n/)
-    end
-
-    def run!
-      `git #{command_with_options}`
+    def execute!(&blk)
+      @process.stdout.each_line do |line|
+        yield line.chomp
+      end
     end
 
     def command_with_options
@@ -20,7 +22,7 @@ module Todidnt
         full_command << " #{option.join(' ')}"
       end
 
-      full_command
+      "git #{full_command}"
     end
   end
 end
