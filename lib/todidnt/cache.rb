@@ -20,7 +20,6 @@ module Todidnt
       File.open("#{CACHE_PATH}/#{key}", 'w') do |file|
         file.write(Marshal.dump(Cache.new(data)))
       end
-
     end
 
     def self.load(key)

@@ -7,10 +7,11 @@ module Todidnt
       @history = []
       @blames = {}
       @unmatched_deletions = []
-
     end
 
     def timeline!
+      # TODO: It would probably be better/simpler to just Marshal the
+      # GitHistory object itself.
       if Cache.exists?(:history)
         puts "Found cached history..."
 
