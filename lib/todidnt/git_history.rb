@@ -173,6 +173,13 @@ module Todidnt
       current_bucket_authors = {}
       bucket_total = 0
 
+      # Add the first bucket of 0
+      buckets << {
+        :timestamp => Time.at(interval_start).strftime('%D'),
+        :authors => {},
+        :total => 0
+      }
+
       i = 0
       # Going through the entire history of +/-'s of TODOs.
       while i < @history.length
@@ -193,7 +200,7 @@ module Todidnt
         # in a new bucket, finish the current bucket.
         if i == (@history.length - 1) || @history[i + 1][:timestamp] >= interval_end
           buckets << {
-            :timestamp => Time.at(interval_start).strftime('%D'),
+            :timestamp => ([Time.at(interval_end), max_commit_date].min).strftime('%D'),
             :authors => current_bucket_authors,
             :total => bucket_total
           }
