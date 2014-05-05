@@ -27,7 +27,7 @@ module Todidnt
       if new_commit != last_commit
         # If there's any new history, update the cache.
         to_cache = {
-          last_commit: last_commit,
+          last_commit: new_commit,
           history: @history,
           blames: @blames,
           unmatched_deletions: @unmatched_deletions
