@@ -65,6 +65,8 @@ module Todidnt
       count = 0
 
       command.execute! do |line|
+        line.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+
         if (diff = /diff --git a\/(.*) b\/(.*)/.match(line))
           filename = diff[1]
         elsif (diff = /^\+(.*TODO.*)/.match(line))
