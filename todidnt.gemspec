@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'todidnt'
-  s.version     = '0.3.0'
+  s.version     = '0.3.1'
   s.summary     = 'Todidnt'
   s.description = "Todidnt finds and dates todos in your git repository."
   s.authors     = ["Amber Feng"]
