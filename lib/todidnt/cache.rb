@@ -15,7 +15,8 @@ module Todidnt
     end
 
     def self.save(key, data)
-      Dir.mkdir(CACHE_PATH) unless Dir.exists?(CACHE_PATH)
+      # Create the destinateion folder unless it already exists.
+      FileUtils.mkdir_p(CACHE_PATH)
 
       File.open("#{CACHE_PATH}/#{key}", 'w') do |file|
         file.write(Marshal.dump(Cache.new(data)))

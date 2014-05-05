@@ -13,7 +13,7 @@ module Todidnt
 
     def self.generate_common
       # Create the destination folder unless it already exists.
-      Dir.mkdir(DESTINATION_PATH) unless Dir.exists?(DESTINATION_PATH)
+      FileUtils.mkdir_p(DESTINATION_PATH)
 
       # Copy over directories (e.g. js, css) to the destination.
       common_dirs = []
