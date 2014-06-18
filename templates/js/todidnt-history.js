@@ -103,3 +103,24 @@ dates.selectAll("rect")
   .style("fill", function(d) { return getColor(d.name); })
   .on("mouseover", tip.show)
   .on("mouseout", tip.hide);
+
+// Legend
+
+var legend = svg.selectAll(".legend")
+  .data(color.domain().slice().reverse())
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+legend.append("rect")
+  .attr("x", 30)
+  .attr("width", 18)
+  .attr("height", 18)
+  .style("fill", getColor);
+
+legend.append("text")
+  .attr("x", 55)
+  .attr("y", 9)
+  .attr("dy", ".35em")
+  .style("text-anchor", "beginning")
+  .text(function(d) { return d; });
