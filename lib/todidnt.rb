@@ -5,6 +5,8 @@ require 'todidnt/todo_line'
 require 'todidnt/git_history'
 require 'todidnt/html_generator'
 
+require 'todidnt/version'
+
 require 'chronic'
 require 'launchy'
 

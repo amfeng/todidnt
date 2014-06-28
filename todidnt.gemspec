@@ -1,6 +1,9 @@
+$:.unshift(File.join(File.dirname(__FILE__), 'lib'))
+require 'todidnt/version'
+
 Gem::Specification.new do |s|
   s.name        = 'todidnt'
-  s.version     = '0.3.1'
+  s.version     = Todidnt::VERSION
   s.summary     = 'Todidnt'
   s.description = "Todidnt finds and dates todos in your git repository."
   s.authors     = ["Amber Feng"]

@@ -9,6 +9,11 @@ opts = Slop.parse(ARGV, help: true) do
   on 'p','path=', 'Git directory to run Todidnt in (default: current directory)', default: '.'
   on 't', 'threshold=', 'Threshold of % of TODOs at which to count someone as an individual contributor (rather than "Other" (default: 0.03, which means 3%).', as: Float, default: 0.03
 
+  on 'version', 'Print the version.' do
+    puts Todidnt::VERSION
+    exit
+  end
+
   commands = ['clear']
   commands.each do |c|
     command c do
