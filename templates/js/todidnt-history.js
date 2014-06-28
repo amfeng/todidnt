@@ -4,10 +4,10 @@ var margin = {
   top: 20,
   right: 20,
   bottom: 30,
-  left: Math.round(window.innerWidth * 0.09)
+  left: 50
 };
 
-var width = window.innerWidth * 0.8, height = 500;
+var width = window.innerWidth * 0.70, height = 500;
 
 // Graph scale setup
 
@@ -62,7 +62,7 @@ var data = PRELOADED_DATA['history'].map(function(d) {
 
 // Graph creation
 
-var svg = d3.select("section.content").append("svg")
+var svg = d3.select("#graph").append("svg")
   .attr("width", '100%')
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -106,21 +106,27 @@ dates.selectAll("rect")
 
 // Legend
 
-var legend = svg.selectAll(".legend")
-  .data(color.domain().slice().reverse())
-  .enter().append("g")
-  .attr("class", "legend")
-  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+var legend_svg = d3.select("#legend")
+  .append('svg')
+  .style("height", color.domain().length * 20);
 
-legend.append("rect")
-  .attr("x", 30)
+var legend = legend_svg.append('g')
+  .attr("class", "legend")
+
+legend.selectAll('rect')
+  .data(color.domain().slice().reverse())
+  .enter().append("rect")
   .attr("width", 18)
   .attr("height", 18)
+  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
   .style("fill", getColor);
 
-legend.append("text")
-  .attr("x", 55)
+legend.selectAll('text')
+  .data(color.domain().slice().reverse())
+  .enter().append("text")
+  .attr("x", 25)
   .attr("y", 9)
   .attr("dy", ".35em")
+  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
   .style("text-anchor", "beginning")
   .text(function(d) { return d; });

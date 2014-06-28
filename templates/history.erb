@@ -1,6 +1,26 @@
+<style type='text/css'>
+  #legend {
+    width: 19%;
+    height: 500px;
+    overflow: auto;
+
+    margin-top: 20px;
+  }
+
+  #graph {
+    float: left;
+    overflow: auto;
+    width: 80%;
+  }
+</style>
+
+<div id='graph'></div>
+<div id='legend'></div>
+
 <script src='js/vendor/d3.min.js'></script>
 <script src='js/vendor/d3-tip.js'></script>
 <script type='text/javascript'>
   PRELOADED_DATA = <%= data.to_json %>;
 </script>
 <script src='js/todidnt-history.js'></script>
+
