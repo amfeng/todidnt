@@ -23,9 +23,9 @@ module Todidnt
       end
     end
 
-    def self.generate(options)
-      GitRepo.new(options[:path]).run do |path|
-        history = GitHistory.new
+    def self.generate(opts)
+      GitRepo.new(opts[:path]).run do |path|
+        history = GitHistory.new(opts)
         buckets, authors = history.timeline!
 
         lines = TodoLine.all(["TODO"])
@@ -47,7 +47,7 @@ module Todidnt
       end
     end
 
-    def self.clear(options)
+    def self.clear(opts)
       puts "Deleting cache..."
       Cache.clear!
       puts "Done!"

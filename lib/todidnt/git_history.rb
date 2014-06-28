@@ -3,10 +3,14 @@ module Todidnt
 
     attr_accessor :blames
 
-    def initialize
+    def initialize(opts)
       @history = []
       @blames = {}
       @unmatched_deletions = []
+
+      # Contributor threshold (e.g. only show as a separate contributor
+      # if they've contributed to > N% of TODOs).
+      @threshold = opts[:threshold]
     end
 
     def timeline!
@@ -223,7 +227,7 @@ module Todidnt
         bucket[:authors].each do |author, count|
           # Only include the author if they account for more than > 3% of
           # the TODOs in this bucket.
-          if count > bucket[:total] * 0.03
+          if count > bucket[:total] * @threshold
             significant_authors[author] = count
             authors << author
           else

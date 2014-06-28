@@ -2,25 +2,19 @@
 
 require 'optparse'
 require 'todidnt'
+require 'slop'
 
-options = {:path => '.'}
-command = ARGV.shift
+command = nil
+opts = Slop.parse(ARGV, help: true) do
+  on 'p','path=', 'Git directory to run Todidnt in (default: current directory)', default: '.'
+  on 't', 'threshold=', 'Threshold of % of TODOs at which to count someone as an individual contributor (rather than "Other" (default: 0.03, which means 3%).', as: Float, default: 0.03
 
-ARGV.options do |opts|
-  opts.on('-p', '--path PATH', 'Git directory to run Todidnt in (default: current directory)') do |path|
-    options[:path] = path
+  commands = ['clear']
+  commands.each do |c|
+    command c do
+      run do command = c end
+    end
   end
-
-  opts.on('-d', '--date STRING', 'Fuzzy string for overdue date comparison, e.g. last week or 7/2/2013 (default: today)') do |date|
-    options[:date] = date
-  end
-
-  opts.on_tail('-h', '--help', 'Show this message') do
-    puts opts
-    exit
-  end
-
-  opts.parse!
 end
 
-Todidnt::CLI.run(command, options)
+Todidnt::CLI.run(command, opts)
