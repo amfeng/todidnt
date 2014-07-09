@@ -3,8 +3,12 @@ Todidnt
 
 (:construction: This project is currently under construction! :construction:)
 
-Todidnt is a utility to help you track down TODOs and FIXMEs that you always
-said you'd do but haven't done yet.
+Todidnt is a command line utility to help you track down TODOs and FIXMEs that 
+you always said you'd do but haven't actually done yet. It also generates pretty
+graphs to show you TODO history in your repository over time:
+
+![todidnt-rails-screenshot](https://cloud.githubusercontent.com/assets/286015/3520069/33fe0e7e-0727-11e4-9a88-6b70dbff236c.png)
+
 
 Usage
 ----
@@ -17,15 +21,7 @@ Then, run `todidnt` in any Git repository directory:
 
     $ todidnt
 
-TODO[1]
-----
-
-- Filtering by author, label
-- TODO stats
-
 Credit
 ----
 
 Paul Battley (@threedaymonk) for initial idea and witty name.
-
-1: Oh, the irony.
