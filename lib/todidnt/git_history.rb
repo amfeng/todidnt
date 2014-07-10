@@ -158,16 +158,22 @@ module Todidnt
       # Figure out what the interval should be based on the total timespan.
       if timespan > 86400 * 365 * 10 # 10+ years
         interval = 86400 * 365 # years
+        timespan_label = 'years'
       elsif timespan > 86400 * 365 * 5 # 5-10 years
         interval = 86400 * (365 / 2) # 6 months
+        timespan_label = 'months'
       elsif timespan > 86400 * 365 # 2-5 years
         interval = 86400 * (365 / 4) # 3 months
+        timespan_label = 'months'
       elsif timespan > 86400 * 30 * 6 # 6 months-3 year
         interval = 86400 * 30 # months
-      elsif timespan > 86400 * 1 # 1 month - 6 months
+        timespan_label = 'months'
+      elsif timespan > 86400 * 14 * 1 # 1/2 month - 6 months
         interval = 86400 * 7
-      else # 0 - 2 months
+        timespan_label = 'days'
+      else # 0 - 1/2 months
         interval = 86400 # days
+        timespan_label = 'days'
       end
 
       original_interval_start = Time.new(min_commit_date.year, min_commit_date.month, min_commit_date.day).to_i
@@ -181,7 +187,7 @@ module Todidnt
 
       # Add the first bucket of 0
       buckets << {
-        :timestamp => Time.at(interval_start).strftime('%D'),
+        :timestamp => format_date(Time.at(interval_start), timespan_label),
         :authors => {},
         :total => 0
       }
@@ -206,7 +212,7 @@ module Todidnt
         # in a new bucket, finish the current bucket.
         if i == (@history.length - 1) || @history[i + 1][:timestamp] >= interval_end
           buckets << {
-            :timestamp => ([Time.at(interval_end), max_commit_date].min).strftime('%D'),
+            :timestamp => format_date(([Time.at(interval_end), max_commit_date].min), timespan_label),
             :authors => current_bucket_authors,
             :total => bucket_total
           }
@@ -250,5 +256,17 @@ module Todidnt
       [buckets, authors]
     end
 
+    private
+
+    def format_date(date, timespan_label)
+      case timespan_label
+      when 'years'
+        date.strftime('%Y')
+      when 'months'
+        date.strftime('%-m/%y')
+      when 'days'
+        date.strftime('%-m/%-d')
+      end
+    end
   end
 end
