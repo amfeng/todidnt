@@ -84,21 +84,6 @@ svg.call(tip);
 x.domain(data.map(function(d) { return d.date; }));
 y.domain([0, d3.max(data, function(d) { return d.total; })]);
 
-svg.append("g")
-.attr("class", "x axis")
-.attr("transform", "translate(0," + height + ")")
-.call(xAxis);
-
-svg.append("g")
-  .attr("class", "y axis")
-  .call(yAxis)
-  .append("text")
-  .attr("transform", "rotate(-90)")
-  .attr("y", 6)
-  .attr("dy", ".71em")
-  .style("text-anchor", "end")
-  .text("TODOs");
-
 var dates = svg.selectAll(".dates")
   .data(data)
   .enter().append("g")
@@ -114,6 +99,24 @@ dates.selectAll("rect")
   .style("fill", function(d) { return getColor(d.name); })
   .on("mouseover", tip.show)
   .on("mouseout", tip.hide);
+
+
+// Axes
+
+svg.append("g")
+.attr("class", "x axis")
+.attr("transform", "translate(0," + height + ")")
+.call(xAxis);
+
+svg.append("g")
+  .attr("class", "y axis")
+  .call(yAxis)
+  .append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .style("text-anchor", "end")
+  .text("TODOs");
 
 // Legend
 
