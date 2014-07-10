@@ -27,6 +27,17 @@ var getColor = function(name) {
   }
 };
 
+var getGrayscaleColor = function(name) {
+  var color = getColor(name);
+
+  // Grayscale the color.
+  hsl = d3.hsl(color);
+  l = hsl.l;
+  l = Math.min(l + ((1 - l) * 0.85), 0.95);
+
+  return d3.hsl(hsl.h, 0, l);
+}
+
 var xAxis = d3.svg.axis()
   .scale(x)
   .orient("bottom");
@@ -111,7 +122,7 @@ var legend_svg = d3.select("#legend")
   .style("height", color.domain().length * 20);
 
 var legend = legend_svg.append('g')
-  .attr("class", "legend")
+  .attr("class", "legend");
 
 legend.selectAll('rect')
   .data(color.domain().slice().reverse())
@@ -119,7 +130,30 @@ legend.selectAll('rect')
   .attr("width", 18)
   .attr("height", 18)
   .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; })
-  .style("fill", getColor);
+  .style("fill", getColor)
+  .style("cursor", "pointer")
+  .on('click', function(d, i) {
+    j = color.domain().length - i - 1; // reversed for some reason
+    dates.selectAll("rect").style("fill",
+      function(d2, i2) {
+        if (j != i2) {
+          return getGrayscaleColor(d2.name);
+        } else {
+          return getColor(d2.name);
+        }
+      }
+    )
+
+    legend.selectAll("rect").style("fill",
+      function(d2, i2) {
+        if (i != i2) {
+          return getGrayscaleColor(d2);
+        } else {
+          return getColor(d2);
+        }
+      }
+    )
+  })
 
 legend.selectAll('text')
   .data(color.domain().slice().reverse())
