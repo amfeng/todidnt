@@ -5,6 +5,7 @@ gem 'chronic'
 gem 'launchy'
 gem 'tilt'
 gem 'slop'
+gem 'subprocess'
 
 group 'test' do
   gem 'minitest'
