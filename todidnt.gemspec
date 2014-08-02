@@ -9,6 +9,12 @@ Gem::Specification.new do |s|
   s.authors     = ["Amber Feng"]
   s.email       = 'amber.feng@gmail.com'
 
+  s.add_dependency('chronic')
+  s.add_dependency('launchy')
+  s.add_dependency('tilt')
+  s.add_dependency('slop')
+  s.add_dependency('subprocess')
+
   s.add_development_dependency('minitest')
   s.add_development_dependency('mocha')
 

@@ -1,7 +1,17 @@
+PATH
+  remote: .
+  specs:
+    todidnt (0.3.1)
+      chronic
+      launchy
+      slop
+      subprocess
+      tilt
+
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.5)
+    addressable (2.3.6)
     chronic (0.10.2)
     launchy (2.4.2)
       addressable (~> 2.3)
@@ -9,14 +19,14 @@ GEM
     minitest (5.0.8)
     mocha (0.14.0)
       metaclass (~> 0.0.1)
-    tilt (2.0.0)
+    slop (3.6.0)
+    subprocess (1.2.0)
+    tilt (2.0.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  chronic
-  launchy
   minitest
   mocha
-  tilt
+  todidnt!
