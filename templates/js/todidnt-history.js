@@ -122,7 +122,8 @@ svg.append("g")
 
 var legend_svg = d3.select("#legend")
   .append('svg')
-  .style("height", color.domain().length * 20);
+  .style("height", color.domain().length * 20)
+  .style("width", "100%");
 
 var legend = legend_svg.append('g')
   .attr("class", "legend");
