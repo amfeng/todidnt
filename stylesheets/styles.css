@@ -1,172 +1,34 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:300italic,700italic,300,700);
 
+html, body {
+  margin: 0;
+}
+
 body {
-  padding:50px;
-  font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font:16px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color:#777;
   font-weight:300;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color:#222;
-  margin:0 0 20px;
-}
+/* Global */
 
 p, ul, ol, table, pre, dl {
   margin:0 0 20px;
 }
 
-h1, h2, h3 {
-  line-height:1.1;
-}
-
-h1 {
-  font-size:28px;
-}
-
-h2 {
-  color:#393939;
-}
-
-h3, h4, h5, h6 {
-  color:#494949;
-}
-
 a {
-  color:#39c;
-  font-weight:400;
-  text-decoration:none;
-}
-
-a small {
-  font-size:11px;
-  color:#777;
-  margin-top:-0.6em;
-  display:block;
-}
-
-.wrapper {
-  width:860px;
-  margin:0 auto;
-}
-
-blockquote {
-  border-left:1px solid #e5e5e5;
-  margin:0;
-  padding:0 0 0 20px;
-  font-style:italic;
-}
-
-code, pre {
-  font-family:Monaco, Bitstream Vera Sans Mono, Lucida Console, Terminal;
-  color:#333;
-  font-size:12px;
-}
-
-pre {
-  padding:8px 15px;
-  background: #f8f8f8;  
-  border-radius:5px;
-  border:1px solid #e5e5e5;
-  overflow-x: auto;
-}
-
-table {
-  width:100%;
-  border-collapse:collapse;
-}
-
-th, td {
-  text-align:left;
-  padding:5px 10px;
-  border-bottom:1px solid #e5e5e5;
-}
-
-dt {
-  color:#444;
-  font-weight:700;
-}
-
-th {
-  color:#444;
+  color:#5F94C6;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 img {
   max-width:100%;
 }
 
-header {
-  width:270px;
-  float:left;
-  position:fixed;
-}
-
-header ul {
-  list-style:none;
-  height:40px;
-  
-  padding:0;
-  
-  background: #eee;
-  background: -moz-linear-gradient(top, #f8f8f8 0%, #dddddd 100%);
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f8f8f8), color-stop(100%,#dddddd));
-  background: -webkit-linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
-  background: -o-linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
-  background: -ms-linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
-  background: linear-gradient(top, #f8f8f8 0%,#dddddd 100%);
-  
-  border-radius:5px;
-  border:1px solid #d2d2d2;
-  box-shadow:inset #fff 0 1px 0, inset rgba(0,0,0,0.03) 0 -1px 0;
-  width:270px;
-}
-
-header li {
-  width:89px;
-  float:left;
-  border-right:1px solid #d2d2d2;
-  height:40px;
-}
-
-header ul a {
-  line-height:1;
-  font-size:11px;
-  color:#999;
-  display:block;
-  text-align:center;
-  padding-top:6px;
-  height:40px;
-}
-
 strong {
   color:#222;
   font-weight:700;
-}
-
-header ul li + li {
-  width:88px;
-  border-left:1px solid #fff;
-}
-
-header ul li + li + li {
-  border-right:none;
-  width:89px;
-}
-
-header ul a strong {
-  font-size:14px;
-  display:block;
-  color:#222;
-}
-
-section {
-  width:500px;
-  float:right;
-  padding-bottom:50px;
-}
-
-small {
-  font-size:11px;
 }
 
 hr {
@@ -176,11 +38,103 @@ hr {
   margin:0 0 20px;
 }
 
+
+/* Wrapper */
+
+.wrapper {
+  padding: 50px 0 50px 0;
+  width: 50%;
+  margin:0 auto;
+}
+
+/* Header */
+
+header {
+  font-size: 1.4em;
+  color: #95B0CF;
+  text-align: center;
+
+  margin: auto;
+  margin-top: 85px;
+}
+
+header h1 {
+  text-indent: -9999px;
+  height: 67px;
+  width: 459px;
+  background-image: url(../images/logo.png);
+
+  margin: auto;
+  margin-bottom: 30px;
+}
+
+header p {
+  margin-bottom: 50px;
+}
+
+header .graph {
+  background-image: url(../images/graph.png);
+  background-size: 700px 360px;
+  width: 700px;
+  height: 360px;
+
+  margin: auto;
+}
+
+@media only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (min-devicepixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) {
+  header h1 {
+    background-image: url(../images/logo@2x.png);
+    background-size: 459px 67px;
+  }
+}
+
+/* Installation / Usage */
+
+section.code {
+  background: #45494F;
+}
+
+section.code h2 {
+  font-size: 1.6em;
+  color: #86ACCF;
+  font-family: 'inconsolata', Monaco, Terminal;
+}
+
+pre {
+  color: #eee;
+  font-size: 1.3em;
+  margin-bottom: 50px;
+}
+
+pre code {
+  font-family: 'inconsolata', Monaco, Terminal;
+}
+
+pre:last-child {
+  margin-bottom: 0;
+}
+
+code .bash {
+  color: #5F94C6;
+}
+
+code .result {
+  color: #7C8998;
+}
+
+/* Footer */
+
 footer {
-  width:270px;
-  float:left;
-  position:fixed;
+  text-align: center;
   bottom:50px;
+}
+
+.github-button {
+  display: inline-block;
+
+  position: relative;
+  top: 4px;
+  left: 5px;
 }
 
 @media print, screen and (max-width: 960px) {
@@ -189,46 +143,18 @@ footer {
     width:auto;
     margin:0;
   }
-  
-  header, section, footer {
-    float:none;
-    position:static;
-    width:auto;
-  }
-  
-  header {
-    padding-right:320px;
-  }
-  
+
   section {
     border:1px solid #e5e5e5;
     border-width:1px 0;
     padding:20px 0;
     margin:0 0 20px;
   }
-  
-  header a small {
-    display:inline;
-  }
-  
-  header ul {
-    position:absolute;
-    right:50px;
-    top:52px;
-  }
 }
 
 @media print, screen and (max-width: 720px) {
   body {
     word-wrap:break-word;
-  }
-  
-  header {
-    padding:0;
-  }
-  
-  header ul, header p.view {
-    position:static;
   }
   
   pre, code {
@@ -239,10 +165,6 @@ footer {
 @media print, screen and (max-width: 480px) {
   body {
     padding:15px;
-  }
-  
-  header ul {
-    display:none;
   }
 }
 
